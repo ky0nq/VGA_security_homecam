@@ -1,0 +1,96 @@
+`timescale 1ns / 1ps
+//
+// Minimal 8N1 UART transmitter. Pulse tx_start with tx_data held stable to
+// send one byte; tx_busy stays high for the duration and tx_done pulses for
+// one clock when the stop bit has been sent.
+//
+module uart_tx #(
+    parameter integer CLK_FREQ  = 100_000_000,
+    parameter integer BAUD_RATE = 115200
+) (
+    input  logic       clk,
+    input  logic       reset,
+    input  logic       tx_start,
+    input  logic [7:0] tx_data,
+    output logic       tx_busy,
+    output logic        tx_done,
+    output logic        tx
+);
+
+    localparam integer CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
+
+    typedef enum logic [1:0] {S_IDLE, S_START, S_DATA, S_STOP} state_t;
+    state_t state;
+
+    logic [$clog2(CLKS_PER_BIT)-1:0] clk_cnt;
+    logic [2:0] bit_idx;
+    logic [7:0] data_reg;
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state    <= S_IDLE;
+            clk_cnt  <= 0;
+            bit_idx  <= 0;
+            data_reg <= 0;
+            tx       <= 1'b1;
+            tx_busy  <= 1'b0;
+            tx_done  <= 1'b0;
+        end else begin
+            tx_done <= 1'b0;
+            case (state)
+                S_IDLE: begin
+                    tx      <= 1'b1;
+                    clk_cnt <= 0;
+                    bit_idx <= 0;
+                    if (tx_start) begin
+                        data_reg <= tx_data;
+                        tx_busy  <= 1'b1;
+                        state    <= S_START;
+                    end else begin
+                        tx_busy <= 1'b0;
+                    end
+                end
+
+                S_START: begin
+                    tx <= 1'b0;
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        state   <= S_DATA;
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                S_DATA: begin
+                    tx <= data_reg[bit_idx];
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        if (bit_idx == 3'd7) begin
+                            bit_idx <= 0;
+                            state   <= S_STOP;
+                        end else begin
+                            bit_idx <= bit_idx + 1'b1;
+                        end
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                S_STOP: begin
+                    tx <= 1'b1;
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        tx_busy <= 1'b0;
+                        tx_done <= 1'b1;
+                        state   <= S_IDLE;
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                default: state <= S_IDLE;
+            endcase
+        end
+    end
+
+endmodule
