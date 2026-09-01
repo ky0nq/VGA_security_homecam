@@ -1,0 +1,101 @@
+`timescale 1ns / 1ps
+//
+// Minimal 8N1 UART receiver. Restarts its bit-timing counter on every start
+// bit, so it stays center-aligned to each frame instead of drifting on a
+// free-running divider. rx_done pulses for one clock with rx_data valid
+// only when the stop bit sampled high (frame looked well-formed).
+//
+module uart_rx #(
+    parameter integer CLK_FREQ  = 100_000_000,
+    parameter integer BAUD_RATE = 115200
+) (
+    input  logic       clk,
+    input  logic       reset,
+    input  logic       rx,
+    output logic [7:0] rx_data,
+    output logic       rx_done
+);
+
+    localparam integer CLKS_PER_BIT     = CLK_FREQ / BAUD_RATE;
+    localparam integer CLKS_PER_HALFBIT = CLKS_PER_BIT / 2;
+
+    typedef enum logic [1:0] {S_IDLE, S_START, S_DATA, S_STOP} state_t;
+    state_t state;
+
+    logic [$clog2(CLKS_PER_BIT)-1:0] clk_cnt;
+    logic [2:0] bit_idx;
+    logic [7:0] data_reg;
+    logic rxd_sync0, rxd_sync1;
+
+    always_ff @(posedge clk) begin
+        rxd_sync0 <= rx;
+        rxd_sync1 <= rxd_sync0;
+    end
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state    <= S_IDLE;
+            clk_cnt  <= 0;
+            bit_idx  <= 0;
+            data_reg <= 0;
+            rx_data  <= 0;
+            rx_done  <= 1'b0;
+        end else begin
+            rx_done <= 1'b0;
+            case (state)
+                S_IDLE: begin
+                    clk_cnt <= 0;
+                    bit_idx <= 0;
+                    if (rxd_sync1 == 1'b0) begin
+                        state <= S_START;
+                    end
+                end
+
+                S_START: begin
+                    // sample mid-way through the start bit to confirm it's real
+                    if (clk_cnt == CLKS_PER_HALFBIT-1) begin
+                        clk_cnt <= 0;
+                        if (rxd_sync1 == 1'b0) begin
+                            state <= S_DATA;
+                        end else begin
+                            state <= S_IDLE;
+                        end
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                S_DATA: begin
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        data_reg[bit_idx] <= rxd_sync1;
+                        if (bit_idx == 3'd7) begin
+                            bit_idx <= 0;
+                            state   <= S_STOP;
+                        end else begin
+                            bit_idx <= bit_idx + 1'b1;
+                        end
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                S_STOP: begin
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <=  0;
+                        state   <= S_IDLE;
+                        if (rxd_sync1 == 1'b1) begin
+                            rx_data <= data_reg;
+                            rx_done <= 1'b1;
+                        end
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                default: state <= S_IDLE;
+            endcase
+        end
+    end
+
+endmodule
