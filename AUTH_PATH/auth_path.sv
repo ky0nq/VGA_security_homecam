@@ -68,8 +68,8 @@ module auth_path #(
     // =========================================================
     // auth_active: clk → pclk
     // =========================================================
-    (* ASYNC_REG = "TRUE" *) logic auth_active_pclk_meta;
-    (* ASYNC_REG = "TRUE" *) logic auth_active_pclk;
+    logic auth_active_pclk_meta;
+    logic auth_active_pclk;
 
     always_ff @(posedge pclk or negedge rst_n) begin
         if (!rst_n) begin
@@ -87,12 +87,12 @@ module auth_path #(
     logic path_clear_toggle_clk;
     logic analysis_clear_toggle_clk;
 
-    (* ASYNC_REG = "TRUE" *) logic path_clear_toggle_meta;
-    (* ASYNC_REG = "TRUE" *) logic path_clear_toggle_sync;
+    logic path_clear_toggle_meta;
+    logic path_clear_toggle_sync;
     logic path_clear_toggle_d;
 
-    (* ASYNC_REG = "TRUE" *) logic analysis_clear_toggle_meta;
-    (* ASYNC_REG = "TRUE" *) logic analysis_clear_toggle_sync;
+    logic analysis_clear_toggle_meta;
+    logic analysis_clear_toggle_sync;
     logic analysis_clear_toggle_d;
 
     logic analysis_clear_pclk;
@@ -199,8 +199,7 @@ module auth_path #(
     logic frame_result_pending_pclk;
     logic frame_start_pclk;
 
-    assign frame_start_pclk =
-        i_cam_vsync & ~cam_vsync_d_pclk;
+    assign frame_start_pclk = i_cam_vsync & ~cam_vsync_d_pclk;
 
     always_ff @(posedge pclk or negedge rst_n) begin
         if (!rst_n) begin
@@ -211,8 +210,7 @@ module auth_path #(
             cam_vsync_d_pclk <= i_cam_vsync;
             frame_result_pending_pclk <= frame_start_pclk;
 
-            o_track_update_pulse <=
-                frame_result_pending_pclk & auth_active_pclk;
+            o_track_update_pulse <= frame_result_pending_pclk & auth_active_pclk;
         end
     end
 
@@ -285,11 +283,9 @@ module auth_path #(
             stable_grid_enter_pclk &&
             auth_active_pclk
         ) begin
-            grid_event_toggle_pclk <=
-                ~grid_event_toggle_pclk;
+            grid_event_toggle_pclk <= ~grid_event_toggle_pclk;
 
-            grid_event_id_pclk <=
-                stable_grid_id_pclk;
+            grid_event_id_pclk <= stable_grid_id_pclk;
         end
     end
 
@@ -298,20 +294,20 @@ module auth_path #(
     logic grid_event_toggle_d;
     logic grid_enter_clk;
 
-    (* ASYNC_REG = "TRUE" *) logic [3:0] grid_event_id_meta;
-    (* ASYNC_REG = "TRUE" *) logic [3:0] grid_event_id_sync;
+    logic [3:0] grid_event_id_meta;
+    logic [3:0] grid_event_id_sync;
 
     // =========================================================
     // 현재 Marker/Grid 상태: pclk → clk
     // =========================================================
-    (* ASYNC_REG = "TRUE" *) logic marker_valid_meta;
-    (* ASYNC_REG = "TRUE" *) logic marker_valid_clk;
+    logic marker_valid_meta;
+    logic marker_valid_clk;
 
-    (* ASYNC_REG = "TRUE" *) logic current_grid_valid_meta;
-    (* ASYNC_REG = "TRUE" *) logic current_grid_valid_clk;
+    logic current_grid_valid_meta;
+    logic current_grid_valid_clk;
 
-    (* ASYNC_REG = "TRUE" *) logic [3:0] current_grid_id_meta;
-    (* ASYNC_REG = "TRUE" *) logic [3:0] current_grid_id_clk;
+    logic [3:0] current_grid_id_meta;
+    logic [3:0] current_grid_id_clk;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
