@@ -1,18 +1,17 @@
 `timescale 1ns / 1ps
 
 // ============================================================
-// box_blur_5x5_pipe
-
-//   인터페이스는 gaussian_filter_pipe와 동일 (clk, rst_n, en, i_*, o_*)
-//   라인 버퍼가 4개 필요함(2개 → 4개), 그만큼 LATENCY도 늘어남
+// gauss_filter_pipe (5x5 버전)
+//   5x5 균일 평균(box blur) - 25개 픽셀을 다 더해서 25로 나눔
+//   항상 블러링된 결과만 출력함 (en 없음, 원본 통과 기능 없음)
+//   -> unlock_en에 따라 이 모듈 결과를 쓸지 말지는 상위 MUX가 결정
 // ============================================================
 
-module gaussian_filter_pipe #(
+module gauss_filter_pipe #(
     parameter int IMG_WIDTH = 800   // 한 줄(H_Whole_line)당 pclk 틱 수
 )(
     input  logic        clk,
     input  logic        rst_n,
-    input  logic        en,         // 1: 블러 적용, 0: 원본 통과
 
     input  logic        i_h_sync,
     input  logic        i_v_sync,
@@ -92,10 +91,9 @@ module gaussian_filter_pipe #(
     assign row4_stream = line_buf4[IMG_WIDTH-1];
 
     // ---------------- 5-tap column shift (row별 5개씩) ----------------
-    // c0=방금 ~ c4=4칸 전, 중앙(c2)이 5칸 윈도우의 정중앙
     logic [11:0] r0_c0, r0_c1, r0_c2, r0_c3, r0_c4; // 현재 라인
     logic [11:0] r1_c0, r1_c1, r1_c2, r1_c3, r1_c4; // 1줄 위
-    logic [11:0] r2_c0, r2_c1, r2_c2, r2_c3, r2_c4; // 2줄 위 (5줄 중 정중앙)
+    logic [11:0] r2_c0, r2_c1, r2_c2, r2_c3, r2_c4; // 2줄 위
     logic [11:0] r3_c0, r3_c1, r3_c2, r3_c3, r3_c4; // 3줄 위
     logic [11:0] r4_c0, r4_c1, r4_c2, r4_c3, r4_c4; // 4줄 위
 
@@ -129,7 +127,6 @@ module gaussian_filter_pipe #(
 
     logic [19:0] sum_r_c, sum_g_c, sum_b_c;
     logic [19:0] sum_r,   sum_g,   sum_b;
-    logic [11:0] center_pixel_c, center_pixel;
 
     assign sum_r_c = sum25(r0_c0[11:8],r0_c1[11:8],r0_c2[11:8],r0_c3[11:8],r0_c4[11:8],
                             r1_c0[11:8],r1_c1[11:8],r1_c2[11:8],r1_c3[11:8],r1_c4[11:8],
@@ -146,21 +143,18 @@ module gaussian_filter_pipe #(
                             r2_c0[3:0],r2_c1[3:0],r2_c2[3:0],r2_c3[3:0],r2_c4[3:0],
                             r3_c0[3:0],r3_c1[3:0],r3_c2[3:0],r3_c3[3:0],r3_c4[3:0],
                             r4_c0[3:0],r4_c1[3:0],r4_c2[3:0],r4_c3[3:0],r4_c4[3:0]);
-    assign center_pixel_c = r2_c2; // 5x5 윈도우 정중앙 = 2줄 위(r2)의 2칸 전(c2)
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             sum_r <= '0; sum_g <= '0; sum_b <= '0;
-            center_pixel <= '0;
         end else if (pclk) begin
             sum_r <= sum_r_c;
             sum_g <= sum_g_c;
             sum_b <= sum_b_c;
-            center_pixel <= center_pixel_c;
         end
     end
 
-    // ---------------- 25로 나누기 + mux + 출력 레지스터 ----------------
+    // ---------------- 25로 나누기 + 출력 레지스터 ----------------
     function automatic logic [3:0] normalize(input logic [19:0] sum);
         logic [19:0] avg;
         avg = sum / WEIGHT_SUM;
@@ -176,7 +170,7 @@ module gaussian_filter_pipe #(
         if (!rst_n) begin
             o_rgb <= '0;
         end else if (pclk) begin
-            o_rgb <= en ? {blur_r, blur_g, blur_b} : center_pixel;
+            o_rgb <= {blur_r, blur_g, blur_b};   // 항상 블러 결과만 출력
         end
     end
 
