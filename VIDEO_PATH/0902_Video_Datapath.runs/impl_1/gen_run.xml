@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GenRun Id="impl_1" LaunchPart="xc7a35tcpg236-1" LaunchTime="1788266173">
+  <File Type="BITSTR-BMM" Name="video_path_bd.bmm"/>
+  <File Type="OPT-METHODOLOGY-DRC" Name="video_path_methodology_drc_opted.rpt"/>
+  <File Type="INIT-TIMING" Name="video_path_timing_summary_init.rpt"/>
+  <File Type="ROUTE-PWR" Name="video_path_power_routed.rpt"/>
+  <File Type="PA-TCL" Name="video_path.tcl"/>
+  <File Type="OPT-TIMING" Name="video_path_timing_summary_opted.rpt"/>
+  <File Type="OPT-DCP" Name="video_path_opt.dcp"/>
+  <File Type="ROUTE-PWR-SUM" Name="video_path_power_summary_routed.pb"/>
+  <File Type="REPORTS-TCL" Name="video_path_reports.tcl"/>
+  <File Type="OPT-DRC" Name="video_path_drc_opted.rpt"/>
+  <File Type="OPT-HWDEF" Name="video_path.hwdef"/>
+  <File Type="PWROPT-DCP" Name="video_path_pwropt.dcp"/>
+  <File Type="PWROPT-DRC" Name="video_path_drc_pwropted.rpt"/>
+  <File Type="PWROPT-TIMING" Name="video_path_timing_summary_pwropted.rpt"/>
+  <File Type="PLACE-DCP" Name="video_path_placed.dcp"/>
+  <File Type="PLACE-IO" Name="video_path_io_placed.rpt"/>
+  <File Type="PLACE-CLK" Name="video_path_clock_utilization_placed.rpt"/>
+  <File Type="PLACE-UTIL" Name="video_path_utilization_placed.rpt"/>
+  <File Type="PLACE-UTIL-PB" Name="video_path_utilization_placed.pb"/>
+  <File Type="PLACE-CTRL" Name="video_path_control_sets_placed.rpt"/>
+  <File Type="PLACE-SIMILARITY" Name="video_path_incremental_reuse_placed.rpt"/>
+  <File Type="PLACE-PRE-SIMILARITY" Name="video_path_incremental_reuse_pre_placed.rpt"/>
+  <File Type="PLACE-TIMING" Name="video_path_timing_summary_placed.rpt"/>
+  <File Type="POSTPLACE-PWROPT-DCP" Name="video_path_postplace_pwropt.dcp"/>
+  <File Type="BG-BIN" Name="video_path.bin"/>
+  <File Type="POSTPLACE-PWROPT-TIMING" Name="video_path_timing_summary_postplace_pwropted.rpt"/>
+  <File Type="PHYSOPT-DCP" Name="video_path_physopt.dcp"/>
+  <File Type="PHYSOPT-DRC" Name="video_path_drc_physopted.rpt"/>
+  <File Type="BITSTR-MSK" Name="video_path.msk"/>
+  <File Type="PHYSOPT-TIMING" Name="video_path_timing_summary_physopted.rpt"/>
+  <File Type="ROUTE-ERROR-DCP" Name="video_path_routed_error.dcp"/>
+  <File Type="ROUTE-DCP" Name="video_path_routed.dcp"/>
+  <File Type="ROUTE-BLACKBOX-DCP" Name="video_path_routed_bb.dcp"/>
+  <File Type="ROUTE-DRC" Name="video_path_drc_routed.rpt"/>
+  <File Type="ROUTE-DRC-PB" Name="video_path_drc_routed.pb"/>
+  <File Type="ROUTE-DRC-RPX" Name="video_path_drc_routed.rpx"/>
+  <File Type="BITSTR-MMI" Name="video_path.mmi"/>
+  <File Type="ROUTE-METHODOLOGY-DRC" Name="video_path_methodology_drc_routed.rpt"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-RPX" Name="video_path_methodology_drc_routed.rpx"/>
+  <File Type="ROUTE-METHODOLOGY-DRC-PB" Name="video_path_methodology_drc_routed.pb"/>
+  <File Type="ROUTE-PWR-RPX" Name="video_path_power_routed.rpx"/>
+  <File Type="ROUTE-STATUS" Name="video_path_route_status.rpt"/>
+  <File Type="ROUTE-STATUS-PB" Name="video_path_route_status.pb"/>
+  <File Type="ROUTE-TIMINGSUMMARY" Name="video_path_timing_summary_routed.rpt"/>
+  <File Type="ROUTE-TIMING-PB" Name="video_path_timing_summary_routed.pb"/>
+  <File Type="ROUTE-TIMING-RPX" Name="video_path_timing_summary_routed.rpx"/>
+  <File Type="ROUTE-SIMILARITY" Name="video_path_incremental_reuse_routed.rpt"/>
+  <File Type="ROUTE-CLK" Name="video_path_clock_utilization_routed.rpt"/>
+  <File Type="ROUTE-BUS-SKEW" Name="video_path_bus_skew_routed.rpt"/>
+  <File Type="ROUTE-BUS-SKEW-PB" Name="video_path_bus_skew_routed.pb"/>
+  <File Type="ROUTE-BUS-SKEW-RPX" Name="video_path_bus_skew_routed.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-DCP" Name="video_path_postroute_physopt.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-BLACKBOX-DCP" Name="video_path_postroute_physopt_bb.dcp"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING" Name="video_path_timing_summary_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-PB" Name="video_path_timing_summary_postroute_physopted.pb"/>
+  <File Type="POSTROUTE-PHYSOPT-TIMING-RPX" Name="video_path_timing_summary_postroute_physopted.rpx"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW" Name="video_path_bus_skew_postroute_physopted.rpt"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-PB" Name="video_path_bus_skew_postroute_physopted.pb"/>
+  <File Type="BG-BIT" Name="video_path.bit"/>
+  <File Type="POSTROUTE-PHYSOPT-BUS-SKEW-RPX" Name="video_path_bus_skew_postroute_physopted.rpx"/>
+  <File Type="BITSTR-RBT" Name="video_path.rbt"/>
+  <File Type="BITSTR-NKY" Name="video_path.nky"/>
+  <File Type="PDI-FILE" Name="video_path.pdi"/>
+  <File Type="RCFI_FILE" Name="video_path.rcfi"/>
+  <File Type="CFI_FILE" Name="video_path.cfi"/>
+  <File Type="RNPI_FILE" Name="video_path.rnpi"/>
+  <File Type="NPI_FILE" Name="video_path.npi"/>
+  <File Type="RBD_FILE" Name="video_path.rbd"/>
+  <File Type="BITSTR-LTX" Name="debug_nets.ltx"/>
+  <File Type="BITSTR-LTX" Name="video_path.ltx"/>
+  <File Type="BITSTR-SYSDEF" Name="video_path.sysdef"/>
+  <File Type="BG-BGN" Name="video_path.bgn"/>
+  <File Type="BG-DRC" Name="video_path.drc"/>
+  <File Type="RDI-RDI" Name="video_path.vdi"/>
+  <File Type="WBT-USG" Name="usage_statistics_webtalk.html"/>
+  <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
+    <Filter Type="Srcs"/>
+    <File Path="$PSRCDIR/sources_1/new/I2C_master.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/OV7670_MemCNTL.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/OV7670_setup_FSM.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/SCCB_setup_CNTL.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/blue_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/filter_apply.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/filter_control.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/framebuffer.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/gamma_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/gaussian_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/gray_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/night_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/orange_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/pclk_gen.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/pink_filter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/pixel_counter.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/rom_reader_upscale.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/vga_cam.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/vga_decoder.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/video_path.sv">
+      <FileInfo>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/uart.sv">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/uart_decoder.sv">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/uart_rx.sv">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/vga_outreg.sv">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <File Path="$PSRCDIR/sources_1/new/OV7670_top.sv">
+      <FileInfo>
+        <Attr Name="AutoDisabled" Val="1"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+        <Attr Name="UsedIn" Val="simulation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="DesignMode" Val="RTL"/>
+      <Option Name="TopModule" Val="video_path"/>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="constrs_in" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
+    <Filter Type="Constrs"/>
+    <File Path="$PSRCDIR/constrs_1/imports/OndeviceAI2/Basys-3-Master.xdc">
+      <FileInfo>
+        <Attr Name="ImportPath" Val="$PPRDIR/../0901_OV7670/0901_OV7670.srcs/constrs_1/imports/OndeviceAI2/Basys-3-Master.xdc"/>
+        <Attr Name="ImportTime" Val="1788234854"/>
+        <Attr Name="UsedIn" Val="synthesis"/>
+        <Attr Name="UsedIn" Val="implementation"/>
+      </FileInfo>
+    </File>
+    <Config>
+      <Option Name="ConstrsType" Val="XDC"/>
+    </Config>
+  </FileSet>
+  <FileSet Name="utils" Type="Utils" RelSrcDir="$PSRCDIR/utils_1">
+    <Filter Type="Utils"/>
+    <Config>
+      <Option Name="TopAutoSet" Val="TRUE"/>
+    </Config>
+  </FileSet>
+  <Strategy Version="1" Minor="2">
+    <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2020"/>
+    <Step Id="init_design"/>
+    <Step Id="opt_design"/>
+    <Step Id="power_opt_design"/>
+    <Step Id="place_design"/>
+    <Step Id="post_place_power_opt_design"/>
+    <Step Id="phys_opt_design"/>
+    <Step Id="route_design"/>
+    <Step Id="post_route_phys_opt_design"/>
+    <Step Id="write_bitstream"/>
+  </Strategy>
+</GenRun>

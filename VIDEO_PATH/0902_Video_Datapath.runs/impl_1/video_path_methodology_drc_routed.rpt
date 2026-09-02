@@ -1,0 +1,919 @@
+Copyright 1986-2020 Xilinx, Inc. All Rights Reserved.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2020.2 (win64) Build 3064766 Wed Nov 18 09:12:45 MST 2020
+| Date         : Tue Sep  1 21:38:49 2026
+| Host         : DESKTOP-7CFQ9ND running 64-bit major release  (build 9200)
+| Command      : report_methodology -file video_path_methodology_drc_routed.rpt -pb video_path_methodology_drc_routed.pb -rpx video_path_methodology_drc_routed.rpx
+| Design       : video_path
+| Device       : xc7a35tcpg236-1
+| Speed File   : -1
+| Design State : Fully Routed
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Report Methodology
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: design_1
+      Design limits: <entire design considered>
+             Max violations: <unlimited>
+             Violations found: 176
++-----------+------------------+--------------------------------------------+------------+
+| Rule      | Severity         | Description                                | Violations |
++-----------+------------------+--------------------------------------------+------------+
+| TIMING-17 | Critical Warning | Non-clocked sequential cell                | 93         |
+| SYNTH-6   | Warning          | Timing of a RAM block might be sub-optimal | 11         |
+| SYNTH-9   | Warning          | Small multiplier                           | 32         |
+| TIMING-16 | Warning          | Large setup violation                      | 12         |
+| TIMING-18 | Warning          | Missing input or output delay              | 28         |
++-----------+------------------+--------------------------------------------+------------+
+
+2. REPORT DETAILS
+-----------------
+TIMING-17#1 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_1/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#2 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_10/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#3 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_12/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#4 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_13/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#5 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_14/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#6 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_15/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#7 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_2/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#8 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_3/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#9 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_4/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#10 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_7/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#11 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_8/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#12 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_0_9/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#13 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_1/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#14 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_10/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#15 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_10__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#16 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_12/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#17 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_12__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#18 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_13/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#19 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_13__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#20 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_14/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#21 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_14__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#22 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_15/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#23 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_15__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#24 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_1__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#25 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_2/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#26 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_2__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#27 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_3/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#28 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_3__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#29 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_4/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#30 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_4__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#31 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_7/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#32 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_7__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#33 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_8/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#34 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_8__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#35 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_9/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#36 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_9__0/CLKARDCLK is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#37 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/byteSel_reg/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#38 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[0]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#39 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#40 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[2]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#41 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[4]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#42 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[5]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#43 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[6]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#44 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/px_data_reg[7]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#45 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[0]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#46 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[0]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#47 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[0]_rep__0/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#48 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[10]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#49 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[10]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#50 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[11]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#51 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[11]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#52 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[12]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#53 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[12]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#54 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[12]_rep__0/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#55 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[13]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#56 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[13]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#57 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[14]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#58 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[14]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#59 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[15]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#60 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[16]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#61 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#62 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[1]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#63 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[2]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#64 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[2]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#65 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[3]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#66 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[3]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#67 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[4]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#68 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[4]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#69 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[4]_rep__0/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#70 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[5]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#71 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[5]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#72 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[6]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#73 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[6]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#74 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[7]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#75 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[7]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#76 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[8]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#77 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[8]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#78 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[8]_rep__0/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#79 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[9]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#80 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wAddr_reg[9]_rep/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#81 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[10]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#82 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[12]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#83 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[13]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#84 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[14]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#85 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[15]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#86 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[1]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#87 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[2]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#88 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[3]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#89 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[4]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#90 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[7]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#91 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[8]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#92 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/wData_reg[9]/C is not reached by a timing clock
+Related violations: <none>
+
+TIMING-17#93 Critical Warning
+Non-clocked sequential cell  
+The clock pin U_VGA_CAM/U_MEM_CNTL/we_reg/C is not reached by a timing clock
+Related violations: <none>
+
+SYNTH-6#1 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_1, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#2 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_10, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#3 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_1__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#4 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_2, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#5 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_2__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#6 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_3, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#7 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_4, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#8 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_4__0, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#9 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_7, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#10 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_8, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-6#11 Warning
+Timing of a RAM block might be sub-optimal  
+The timing for the instance U_VGA_CAM/U_FRAMEBUFFER/mem_reg_1_9, implemented as a RAM block, might be sub-optimal as no output register was merged into the block.
+Related violations: <none>
+
+SYNTH-9#1 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_b_reg[5]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#2 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_b_reg[8]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#3 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_g_reg[11]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#4 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_g_reg[4]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#5 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_g_reg[8]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#6 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_r_reg[10]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#7 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_r_reg[5]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#8 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_BLUE/s1_r_reg[9]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#9 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_b_reg[5]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#10 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_b_reg[8]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#11 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_g_reg[11]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#12 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_g_reg[4]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#13 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_g_reg[8]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#14 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_r_reg[10]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#15 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_r_reg[5]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#16 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_GRAY/s1_r_reg[9]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#17 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_b_reg[5]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#18 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_b_reg[8]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#19 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_g_reg[11]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#20 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_g_reg[4]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#21 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_g_reg[8]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#22 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_r_reg[10]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#23 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_r_reg[5]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#24 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_NIGHT/s1_r_reg[9]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#25 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_b_reg[5]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#26 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_b_reg[8]_i_1 of size 5x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#27 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_g_reg[11]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#28 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_g_reg[4]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#29 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_g_reg[8]_i_1 of size 8x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#30 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_r_reg[10]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#31 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_r_reg[5]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+SYNTH-9#32 Warning
+Small multiplier  
+Detected multiplier at U_FILTER_APPLY/U_ORANGE/s1_r_reg[9]_i_1 of size 7x4, it is implemented as LUTs due to its small size. To force the multiplier onto a DSP block, use the USE_DSP48 attribute.
+Related violations: <none>
+
+TIMING-16#1 Warning
+Large setup violation  
+There is a large setup violation of -1.900 ns between U_GAUSS_FILTER/sum_b_reg[0]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[3]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#2 Warning
+Large setup violation  
+There is a large setup violation of -1.905 ns between U_GAUSS_FILTER/sum_b_reg[0]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[0]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#3 Warning
+Large setup violation  
+There is a large setup violation of -1.997 ns between U_GAUSS_FILTER/sum_r_reg[2]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[11]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#4 Warning
+Large setup violation  
+There is a large setup violation of -2.025 ns between U_GAUSS_FILTER/sum_r_reg[2]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[9]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#5 Warning
+Large setup violation  
+There is a large setup violation of -2.034 ns between U_GAUSS_FILTER/sum_r_reg[2]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[8]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#6 Warning
+Large setup violation  
+There is a large setup violation of -2.037 ns between U_GAUSS_FILTER/sum_b_reg[0]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[1]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#7 Warning
+Large setup violation  
+There is a large setup violation of -2.039 ns between U_GAUSS_FILTER/sum_b_reg[0]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[2]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#8 Warning
+Large setup violation  
+There is a large setup violation of -2.052 ns between U_GAUSS_FILTER/sum_g_reg[2]_replica_1/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[4]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#9 Warning
+Large setup violation  
+There is a large setup violation of -2.053 ns between U_GAUSS_FILTER/sum_g_reg[2]_replica_1/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[6]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#10 Warning
+Large setup violation  
+There is a large setup violation of -2.089 ns between U_GAUSS_FILTER/sum_g_reg[2]_replica_1/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[7]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#11 Warning
+Large setup violation  
+There is a large setup violation of -2.093 ns between U_GAUSS_FILTER/sum_g_reg[2]_replica_1/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[5]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-16#12 Warning
+Large setup violation  
+There is a large setup violation of -2.186 ns between U_GAUSS_FILTER/sum_r_reg[2]_replica/C (clocked by sys_clk_pin) and U_GAUSS_FILTER/o_rgb_reg[10]/D (clocked by sys_clk_pin). Large setup violations at the end of those stages might be difficult to fix during the post-placement implementation flow and could be the result of non-optimal XDC constraints or non-optimal design architecture
+Related violations: <none>
+
+TIMING-18#1 Warning
+Missing input or output delay  
+An input delay is missing on btn_d relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#2 Warning
+Missing input or output delay  
+An input delay is missing on btn_l relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#3 Warning
+Missing input or output delay  
+An input delay is missing on btn_r relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#4 Warning
+Missing input or output delay  
+An input delay is missing on btn_u relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#5 Warning
+Missing input or output delay  
+An input delay is missing on cam_sda relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#6 Warning
+Missing input or output delay  
+An input delay is missing on effect_sel relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#7 Warning
+Missing input or output delay  
+An input delay is missing on rst_n relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#8 Warning
+Missing input or output delay  
+An input delay is missing on unlock_en relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#9 Warning
+Missing input or output delay  
+An input delay is missing on zoom_en relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#10 Warning
+Missing input or output delay  
+An output delay is missing on cam_scl relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#11 Warning
+Missing input or output delay  
+An output delay is missing on o_h_sync relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#12 Warning
+Missing input or output delay  
+An output delay is missing on o_v_sync relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#13 Warning
+Missing input or output delay  
+An output delay is missing on port_blue[0] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#14 Warning
+Missing input or output delay  
+An output delay is missing on port_blue[1] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#15 Warning
+Missing input or output delay  
+An output delay is missing on port_blue[2] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#16 Warning
+Missing input or output delay  
+An output delay is missing on port_blue[3] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#17 Warning
+Missing input or output delay  
+An output delay is missing on port_green[0] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#18 Warning
+Missing input or output delay  
+An output delay is missing on port_green[1] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#19 Warning
+Missing input or output delay  
+An output delay is missing on port_green[2] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#20 Warning
+Missing input or output delay  
+An output delay is missing on port_green[3] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#21 Warning
+Missing input or output delay  
+An output delay is missing on port_red[0] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#22 Warning
+Missing input or output delay  
+An output delay is missing on port_red[1] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#23 Warning
+Missing input or output delay  
+An output delay is missing on port_red[2] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#24 Warning
+Missing input or output delay  
+An output delay is missing on port_red[3] relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#25 Warning
+Missing input or output delay  
+An output delay is missing on setup_busy relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#26 Warning
+Missing input or output delay  
+An output delay is missing on setup_done relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#27 Warning
+Missing input or output delay  
+An output delay is missing on setup_error relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+TIMING-18#28 Warning
+Missing input or output delay  
+An output delay is missing on xclk relative to clock(s) sys_clk_pin
+Related violations: <none>
+
+
