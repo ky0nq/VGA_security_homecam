@@ -5,7 +5,7 @@
 // ============================================================
 module uart_rx #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
-    parameter integer BAUD_RATE   = 9600  
+    parameter integer BAUD_RATE   = 115200
 )(
     input  logic       clk,
     input  logic       rst_n,

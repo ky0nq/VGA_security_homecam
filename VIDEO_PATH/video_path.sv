@@ -8,11 +8,13 @@
 //   unlock_en = 0 (패턴 불일치, 잠김) -> GAUSS_FILTER 결과 사용
 //   unlock_en = 1 (패턴 일치, 잠금 해제) -> FILTER_APPLY 결과 사용
 //     (이때만 zoom_en/btn_l/r/d, effect_sel/btn_u 필터 조작이 실제로 반영됨
-//      - zoom은 rom_reader_upscale이 이미 그렇게 설계됨(zoom_en=0이면 무시),
-//        필터 순환은 filter_control이 unlock_en=unlock_en으로 게이팅함)
+//      - zoom 영역 선택은 rom_reader_upscale이 펄스를 받아 내부에 래치함,
+//        필터 순환은 filter_control이 unlock_en으로 게이팅함)
 //
-//   UART 관련(uart_rx, uart_decoder)은 이 모듈 밖에서 처리하고,
-//   이미 디코딩된 레벨/펄스 신호를 그대로 입력받음
+//   UART 관련(uart_link)은 이 모듈 밖에서 처리하고,
+//   이미 디코딩된 레벨/펄스 신호를 그대로 입력받음.
+//   RGB->RGB444 채널 분리 + 최종 출력 레지스터는 vga_outreg(top)가 담당하므로
+//   여기서는 o_rgb[11:0] 하나만 내보냄
 // ============================================================
 
 module video_path (
@@ -21,13 +23,13 @@ module video_path (
     input logic rst_n,
 
     // UART 디코더에서 이미 분리되어 들어오는 신호들
-    input logic unlock_en,   // uart_decoder의 unlock_en
+    input logic unlock_en,   // uart_link의 unlock_en
     input logic zoom_en,
     input logic effect_sel,
     input logic btn_l,
     input logic btn_r,
     input logic btn_d,
-    input logic btn_u,         // uart_decoder의 btn_u_pulse (이미 1클럭 펄스)
+    input logic btn_u,         // uart_link의 btn_u_pulse (이미 1클럭 펄스)
 
     // OV7670 캡처 인터페이스
     input  logic       cam_href,
@@ -45,15 +47,8 @@ module video_path (
     // 최종 출력 (vga_outreg로 이어짐)
     output logic        o_h_sync,
     output logic        o_v_sync,
-    // output logic [11:0] o_rgb
-
-    // 임시 출력~ 
-    output logic [3:0] port_red,
-    output logic [3:0] port_green,
-    output logic [3:0] port_blue
+    output logic [11:0] o_rgb
 );
-    // 이것도 나중에 삭제
-    logic [11:0] o_rgb;
 
     //============================================================
     // VGA_CAM : SCCB + 캡처 + 프레임버퍼 + 줌/업스케일
@@ -128,21 +123,21 @@ module video_path (
     logic [11:0] filter_rgb;
 
     filter_apply U_FILTER_APPLY (
-        .clk       (clk),
-        .rst_n     (rst_n),
-        .i_h_sync  (cam_h_sync),
-        .i_v_sync  (cam_v_sync),
-        .i_rgb     (cam_rgb),
-        .pink_en   (pink_en),
-        .orange_en (orange_en),
-        .blue_en   (blue_en),
-        .gray_en   (gray_en),
-        .gamma_en  (gamma_en),
+        .clk        (clk),
+        .rst_n      (rst_n),
+        .i_h_sync   (cam_h_sync),
+        .i_v_sync   (cam_v_sync),
+        .i_rgb      (cam_rgb),
+        .pink_en    (pink_en),
+        .orange_en  (orange_en),
+        .blue_en    (blue_en),
+        .gray_en    (gray_en),
+        .gamma_en   (gamma_en),
         .gamma_level(gamma_level),
-        .night_en  (night_en),
-        .o_h_sync  (filter_h_sync),
-        .o_v_sync  (filter_v_sync),
-        .o_rgb     (filter_rgb)
+        .night_en   (night_en),
+        .o_h_sync   (filter_h_sync),
+        .o_v_sync   (filter_v_sync),
+        .o_rgb      (filter_rgb)
     );
 
     //============================================================
@@ -151,15 +146,5 @@ module video_path (
     assign o_rgb    = unlock_en ? filter_rgb    : gauss_rgb;
     assign o_h_sync = unlock_en ? filter_h_sync : gauss_h_sync;
     assign o_v_sync = unlock_en ? filter_v_sync : gauss_v_sync;
-
-
-    //============================================================
-    // 테스트용 - 나중에 주석처리~
-    //============================================================
-    assign o_rgb    = unlock_en ? filter_rgb    : gauss_rgb;
-    assign o_h_sync = unlock_en ? filter_h_sync : gauss_h_sync;
-    assign o_v_sync = unlock_en ? filter_v_sync : gauss_v_sync;
-
-    assign {port_red, port_green, port_blue} = o_rgb;
 
 endmodule
