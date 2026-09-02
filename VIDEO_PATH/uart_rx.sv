@@ -1,25 +1,24 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// uart_rx
-// ============================================================
+// Receives one byte over UART: start bit, 8 data bits, stop bit.
+
 module uart_rx #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
     parameter integer BAUD_RATE   = 115200
 )(
     input  logic       clk,
     input  logic       rst_n,
-    input  logic       rx,        // UART RX 핀 (외부 입력, 비동기)
+    input  logic       rx,        // UART RX pin, comes from outside so it is not synced yet
 
     output logic [7:0]  rx_data,
-    output logic        rx_done    // 1클럭 펄스
+    output logic        rx_done    // 1-clock pulse
 );
 
     localparam integer BIT_PERIOD   = CLK_FREQ_HZ / BAUD_RATE;
     localparam integer HALF_PERIOD  = BIT_PERIOD / 2;
     localparam int     CNT_WIDTH    = $clog2(BIT_PERIOD);
 
-    // ---------------- 2-FF 동기화 (비동기 rx 핀) ----------------
+    // ---------------- 2-flop sync for the rx pin ----------------
     logic rx_sync0, rx_sync1;
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -31,12 +30,12 @@ module uart_rx #(
         end
     end
 
-    // ---------------- FSM ----------------
+    // ---------------- state machine ----------------
     typedef enum logic [1:0] {IDLE, START, DATA, STOP} state_t;
     state_t state;
 
-    logic [CNT_WIDTH-1:0] bit_cnt;   // 현재 비트 구간 안에서의 클럭 카운트
-    logic [2:0]            data_idx; // 0~7, 몇 번째 데이터 비트인지
+    logic [CNT_WIDTH-1:0] bit_cnt;   // how far we are into the current bit
+    logic [2:0]            data_idx; // which data bit (0-7) we are on
     logic [7:0]             shift_reg;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -48,10 +47,10 @@ module uart_rx #(
             rx_data   <= 8'b0;
             rx_done   <= 1'b0;
         end else begin
-            rx_done <= 1'b0; // 기본값: 매 클럭 0, DATA→STOP 전이 시 1클럭만 세팅
+            rx_done <= 1'b0; // default 0 every clock, only set for 1 clock when a byte finishes
 
             case (state)
-                // start bit(0)의 하강 에지를 기다림
+                // wait for the falling edge of the start bit
                 IDLE: begin
                     bit_cnt <= 0;
                     if (!rx_sync1) begin
@@ -59,7 +58,7 @@ module uart_rx #(
                     end
                 end
 
-                // start bit 한가운데서 다시 한 번 0인지 확인(노이즈 방지)
+                // check the middle of the start bit again, in case it was just noise
                 START: begin
                     if (bit_cnt == HALF_PERIOD - 1) begin
                         if (!rx_sync1) begin
@@ -67,14 +66,14 @@ module uart_rx #(
                             data_idx <= 0;
                             state    <= DATA;
                         end else begin
-                            state <= IDLE; // 노이즈였음, 취소
+                            state <= IDLE; // was noise, go back and wait again
                         end
                     end else begin
                         bit_cnt <= bit_cnt + 1;
                     end
                 end
 
-                // 데이터 8비트, 각 비트 구간의 한가운데서 샘플링, LSB부터
+                // sample each of the 8 data bits in the middle of its period, LSB first
                 DATA: begin
                     if (bit_cnt == BIT_PERIOD - 1) begin
                         bit_cnt          <= 0;
@@ -89,7 +88,7 @@ module uart_rx #(
                     end
                 end
 
-                // stop bit(1) 구간 다 지나면 완료 처리
+                // wait out the stop bit, then the byte is done
                 STOP: begin
                     if (bit_cnt == BIT_PERIOD - 1) begin
                         rx_data <= shift_reg;

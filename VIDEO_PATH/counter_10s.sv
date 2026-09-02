@@ -1,27 +1,24 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// counter_10s
-//   1초에 한 번 틱을 만들어서 0~10까지 세는 카운터.
-//   data_10s는 그 펄스가 뜨는 클럭에만 8'b1000_0000, 그 외엔 8'b0
-// ============================================================
+// Counts seconds using the clock and sends a pulse if no rx_done comes in for 10 seconds.
+
 module counter_10s #(
     parameter integer CLK_FREQ_HZ = 100_000_000
 )(
     input  logic clk,
     input  logic rst_n,
 
-    input  logic rx_done,      // uart의 rx_done - 새 데이터 오면 카운터 리셋
+    input  logic rx_done,      // from uart, new data resets the counter
 
-    output logic        done_10s,     // 10초 도달 시 1클럭 펄스 -> lock_force/tx_start 둘 다로
-    output logic [7:0] data_10s      // 10초 도달 시 8'h80, 그 외 8'h00 -> uart의 tx_data로
+    output logic        done_10s,  // 1-clock pulse when we hit 10 seconds
+    output logic [7:0] data_10s   // 8'h80 for that one clock, 8'h00 otherwise
 );
 
-    localparam integer TICK_CYCLES = CLK_FREQ_HZ;      // 1초 = clk 주파수만큼의 사이클
+    localparam integer TICK_CYCLES = CLK_FREQ_HZ;      // 1 second worth of clocks
     localparam int      TICK_WIDTH  = $clog2(TICK_CYCLES);
 
     //============================================================
-    // 1Hz 틱 생성
+    // make a 1Hz tick
     //============================================================
     logic [TICK_WIDTH-1:0] tick_cnt;
     logic                   tick;
@@ -40,10 +37,10 @@ module counter_10s #(
     end
 
     //============================================================
-    // 초 카운터 (0~10, rx_done 오면 리셋, 10에서 멈춤)
+    // second counter, 0 to 10, reset by rx_done, stops counting at 10
     //============================================================
     logic [3:0] sec_cnt;
-    logic        reach_10; // 이번 틱에 9->10으로 막 넘어가는 그 순간(조합)
+    logic        reach_10; // true only the exact tick that pushes sec_cnt from 9 to 10
 
     assign reach_10 = tick && (sec_cnt == 4'd9);
 
@@ -51,14 +48,14 @@ module counter_10s #(
         if (!rst_n) begin
             sec_cnt <= 4'd0;
         end else if (rx_done) begin
-            sec_cnt <= 4'd0;            // 새 데이터 오면 리셋
+            sec_cnt <= 4'd0;            // new data came in, start over
         end else if (tick && sec_cnt < 4'd10) begin
-            sec_cnt <= sec_cnt + 4'd1;  // 10에서 더 안 올라가고 멈춤
+            sec_cnt <= sec_cnt + 4'd1;  // stop at 10, do not wrap around
         end
     end
 
     //============================================================
-    // 10초 도달 순간 : done_10s 1클럭 펄스, data_10s=8'h80
+    // at the moment we hit 10 seconds: done_10s pulses and data_10s = 8'h80
     //============================================================
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

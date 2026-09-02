@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+// Holds the final picture and sync signals in registers right before the VGA pins.
+
 module vga_outreg (
     input  logic        clk,
     input  logic        rst_n,
@@ -11,6 +13,7 @@ module vga_outreg (
     output logic [11:0] o_rgb
 );
 
+    // just register everything one more time before it goes out the pins
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             o_h_sync <= 1'b1;

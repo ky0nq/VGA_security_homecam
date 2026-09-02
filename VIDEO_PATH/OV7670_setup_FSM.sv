@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+// Goes through the camera register list one by one and sends each one with the I2C master.
+
 module OV7670_setup_CNTL #(
     parameter integer CLK_FREQ_HZ = 100_000_000
 )(
@@ -7,52 +9,34 @@ module OV7670_setup_CNTL #(
     input  logic       rst_n,
     input  logic       setup_start,
 
-    //============================================================
-    // I2C Master -> OV7670 Setup Controller
-    //============================================================
+    // status coming back from the I2C master
     input  logic       i2c_busy,
     input  logic       i2c_done,
     input  logic       i2c_ack_error,
 
-    //============================================================
-    // OV7670 Setup Controller -> I2C Master
-    //============================================================
+    // request going out to the I2C master
     output logic       i2c_start,
     output logic [7:0] dev_addr,
     output logic [7:0] reg_addr,
     output logic [7:0] reg_data,
 
-    //============================================================
-    // Setup Status
-    //============================================================
+    // status for the top level
     output logic       setup_busy,
     output logic       setup_done,
     output logic       setup_error
 );
 
-    //============================================================
-    // OV7670 Device Address
-    //
-    // Logic Analyzer : 7-bit = 0x21
-    // Write Address  : 8-bit = 0x42
-    //============================================================
+    // OV7670 write address (7-bit address 0x21 shifted left + write bit)
     localparam logic [7:0] OV7670_DEV_ADDR = 8'h42;
 
-
-    //============================================================
-    // Configuration 개수
-    //============================================================
+    // how many registers we need to send in total
     localparam integer NUM_CONFIG = 67;
     localparam integer CONFIG_IDX_WIDTH = (NUM_CONFIG <= 1) ? 1 : $clog2(NUM_CONFIG);
     logic [CONFIG_IDX_WIDTH-1:0] config_idx;
 
-    //============================================================
-    // OV7670 Reset Delay
-    //
-    // 0x12 = 0x80 이후 30ms Delay
-    //============================================================
+    // after the reset register (0x12 = 0x80) the camera needs about 30ms before anything else
     localparam integer RESET_DELAY_CYCLES = CLK_FREQ_HZ / 1000 * 30;         // 30ms
-    localparam integer DELAY_CNT_WIDTH    = $clog2(RESET_DELAY_CYCLES + 1); 
+    localparam integer DELAY_CNT_WIDTH    = $clog2(RESET_DELAY_CYCLES + 1);
     logic [DELAY_CNT_WIDTH-1:0] delay_cnt;
 
     typedef enum logic [2:0] {
@@ -90,17 +74,14 @@ module OV7670_setup_CNTL #(
 
     assign dev_addr = OV7670_DEV_ADDR;
 
-    //============================================================
-    // OV7670 Configuration LUT
-    // Logic Analyzer에서 확인한 Write Sequence
-    //============================================================
-
+    // Register table, recorded with a logic analyzer while a known-good driver
+    // ran the camera. reg_addr/reg_data just depend on config_idx.
     always_comb begin
         reg_addr = 8'h00;
         reg_data = 8'h00;
         case (config_idx)
 
-             0 : begin reg_addr = 8'h12; reg_data = 8'h80; end
+             0 : begin reg_addr = 8'h12; reg_data = 8'h80; end  // software reset
              1 : begin reg_addr = 8'h3A; reg_data = 8'h04; end
              2 : begin reg_addr = 8'h12; reg_data = 8'h00; end
              3 : begin reg_addr = 8'h13; reg_data = 8'hE7; end
@@ -111,6 +92,7 @@ module OV7670_setup_CNTL #(
              8 : begin reg_addr = 8'h72; reg_data = 8'h11; end
              9 : begin reg_addr = 8'h73; reg_data = 8'hF0; end
 
+            // gamma curve values
             10 : begin reg_addr = 8'h7A; reg_data = 8'h20; end
             11 : begin reg_addr = 8'h7B; reg_data = 8'h10; end
             12 : begin reg_addr = 8'h7C; reg_data = 8'h1E; end
@@ -128,6 +110,7 @@ module OV7670_setup_CNTL #(
             24 : begin reg_addr = 8'h88; reg_data = 8'hD7; end
             25 : begin reg_addr = 8'h89; reg_data = 8'hE8; end
 
+            // gain / AEC base values
             26 : begin reg_addr = 8'h00; reg_data = 8'h00; end
             27 : begin reg_addr = 8'h10; reg_data = 8'h00; end
             28 : begin reg_addr = 8'h0D; reg_data = 8'h40; end
@@ -138,6 +121,7 @@ module OV7670_setup_CNTL #(
             33 : begin reg_addr = 8'h25; reg_data = 8'h33; end
             34 : begin reg_addr = 8'h26; reg_data = 8'hE3; end
 
+            // histogram based AEC/AGC settings
             35 : begin reg_addr = 8'h9F; reg_data = 8'h78; end
             36 : begin reg_addr = 8'hA0; reg_data = 8'h68; end
             37 : begin reg_addr = 8'hA1; reg_data = 8'h03; end
@@ -147,7 +131,8 @@ module OV7670_setup_CNTL #(
             41 : begin reg_addr = 8'hA9; reg_data = 8'h90; end
             42 : begin reg_addr = 8'hAA; reg_data = 8'h94; end
 
-            43 : begin reg_addr = 8'h12; reg_data = 8'h14; end  
+            // switch to RGB output and QVGA scaling
+            43 : begin reg_addr = 8'h12; reg_data = 8'h14; end
             44 : begin reg_addr = 8'h0C; reg_data = 8'h04; end
             45 : begin reg_addr = 8'h3E; reg_data = 8'h19; end
             46 : begin reg_addr = 8'h70; reg_data = 8'h3A; end
@@ -164,17 +149,13 @@ module OV7670_setup_CNTL #(
             54 : begin reg_addr = 8'h19; reg_data = 8'h02; end
             55 : begin reg_addr = 8'h1A; reg_data = 8'h7A; end
             56 : begin reg_addr = 8'h03; reg_data = 8'h0A; end
-            57 : begin reg_addr = 8'h40; reg_data = 8'hD0; end  
-            58 : begin reg_addr = 8'h8C; reg_data = 8'h00; end  
+            57 : begin reg_addr = 8'h40; reg_data = 8'hD0; end
+            58 : begin reg_addr = 8'h8C; reg_data = 8'h00; end
             59 : begin reg_addr = 8'h3D; reg_data = 8'hC0; end
 
-            //--------------------------------------------------------
-            // Color Matrix (채도)
-            //
-            // 0x4F~0x54 = MTX1~MTX6, 0x58 = MTXS
-            // Reset 기본값은 YUV용이라 RGB565에서는 채도가 낮게 나온다.
-            // COM7에서 RGB를 선택한 뒤에 적용해야 한다.
-            //--------------------------------------------------------
+            // Color matrix (saturation). 0x4F~0x54 = MTX1~MTX6, 0x58 = MTXS.
+            // Default reset values are tuned for YUV, so RGB565 looks washed
+            // out unless we set these after picking RGB in COM7.
             60 : begin reg_addr = 8'h4F; reg_data = 8'hB3; end
             61 : begin reg_addr = 8'h50; reg_data = 8'hB3; end
             62 : begin reg_addr = 8'h51; reg_data = 8'h00; end
@@ -202,10 +183,11 @@ module OV7670_setup_CNTL #(
             setup_error <= 1'b0;
         end
         else begin
-            // I2C Master start = 1 clock pulse
+            // i2c_start is only high for 1 clock
             i2c_start <= 1'b0;
             case (state)
 
+                // wait for the start button before doing anything
                 IDLE : begin
                     setup_busy <= 1'b0;
                     if (setup_start_pulse) begin
@@ -218,20 +200,12 @@ module OV7670_setup_CNTL #(
                     end
                 end
 
-                //================================================
-                // LOAD
-                // config_idx에 따라서
-                // reg_addr / reg_data가 LUT에서 결정
-                //================================================
+                // just move on, reg_addr/reg_data are already picked by config_idx
                 LOAD : begin
                     state <= SEND;
                 end
 
-                //================================================
-                // SEND
-                // I2C Master가 사용 중이 아닐 때
-                // start = 1 clock
-                //================================================
+                // wait until the I2C master is free, then start it
                 SEND : begin
                     if (!i2c_busy) begin
                         i2c_start <= 1'b1;
@@ -239,43 +213,24 @@ module OV7670_setup_CNTL #(
                     end
                 end
 
-                //================================================
-                // WAIT
-                // I2C Master Transaction 완료 대기
-                //================================================
+                // wait for the I2C master to finish this write
                 WAIT : begin
                     if (i2c_done) begin
-                        //----------------------------------------
-                        // ACK Error
-                        //----------------------------------------
                         if (i2c_ack_error) begin
                             state <= ERROR;
                         end
-
-                        //----------------------------------------
-                        // 첫 번째 Write
-                        //
-                        // COM7 = 0x80
-                        // Camera Reset 이후 Delay
-                        //----------------------------------------
+                        // register 0 is the software reset, needs an extra delay after it
                         else if (config_idx == 0) begin
                             delay_cnt <= '0;
                             state     <= DELAY;
                         end
-
-                        //----------------------------------------
-                        // 일반 Register Write 완료
-                        //----------------------------------------
                         else begin
                             state <= NEXT;
                         end
                     end
                 end
 
-                //================================================
-                // DELAY
-                // 0x12 = 0x80 Reset 후 10ms
-                //================================================
+                // wait 30ms after the software reset before sending more registers
                 DELAY : begin
                     if (delay_cnt == RESET_DELAY_CYCLES - 1) begin
                         delay_cnt <= '0;
@@ -286,28 +241,18 @@ module OV7670_setup_CNTL #(
                     end
                 end
 
-                //================================================
-                // NEXT
-                //================================================
+                // pick the next register, or finish if that was the last one
                 NEXT : begin
-                    //--------------------------------------------
-                    // 마지막 Register까지 완료
-                    //--------------------------------------------
                     if (config_idx == NUM_CONFIG - 1) begin
                         state <= FINISH;
                     end
-                    //--------------------------------------------
-                    // 다음 Register
-                    //--------------------------------------------
                     else begin
                         config_idx <= config_idx + 1'b1;
                         state <= LOAD;
                     end
                 end
 
-                //================================================
-                // FINISH
-                //================================================
+                // all registers sent successfully
                 FINISH : begin
                     setup_busy <= 1'b0;
                     // Hold until reset or the next setup request for LED visibility.
@@ -315,10 +260,7 @@ module OV7670_setup_CNTL #(
                     state <= IDLE;
                 end
 
-                //================================================
-                // ERROR
-                // ACK 실패
-                //================================================
+                // the camera did not ack one of the writes
                 ERROR : begin
                     setup_busy  <= 1'b0;
                     setup_error <= 1'b1;
@@ -332,9 +274,6 @@ module OV7670_setup_CNTL #(
                     end
                 end
 
-                //================================================
-                // DEFAULT
-                //================================================
                 default : begin
                     state <= IDLE;
                     config_idx <= '0;

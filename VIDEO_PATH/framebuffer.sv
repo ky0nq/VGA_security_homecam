@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 
+// Dual clock memory that stores one camera frame. One side writes, the other side reads.
 
 module framebuffer #(
     parameter IMG_W = 320,
@@ -19,16 +20,17 @@ module framebuffer #(
     output logic [DW-1:0] rData
 );
 
+    // plain array, Vivado turns this into block RAM
     logic [DW-1:0] mem[0:(IMG_W*IMG_H)-1];
 
-    // write
+    // write one pixel whenever we is high
     always_ff @(posedge wclk) begin
         if (we) begin
             mem[wAddr] <= wData;
         end
     end
 
-    // read
+    // read one pixel every clock, VGA side just keeps asking for the next address
     always_ff @(posedge rclk) begin
         rData <= mem[rAddr];
     end

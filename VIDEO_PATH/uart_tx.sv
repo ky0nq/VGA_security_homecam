@@ -1,14 +1,10 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// uart_tx
-//   표준 8N1(start 1 + data 8 + stop 1, parity 없음) UART 송신기
-//   tx_start : 1클럭 펄스로 전송 시작 요청
-//   tx_busy  : 전송 중이면 1 (전송 중엔 tx_start 무시됨)
-// ============================================================
+// Sends one byte over UART: start bit, 8 data bits, stop bit.
+
 module uart_tx #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
-    parameter integer BAUD_RATE   =115200   // 상대 보드 수신측이랑 반드시 일치해야 함
+    parameter integer BAUD_RATE   =115200   // must match the baud rate on the other board
 )(
     input  logic       clk,
     input  logic       rst_n,
@@ -17,7 +13,7 @@ module uart_tx #(
     input  logic        tx_start,
     output logic        tx_busy,
 
-    output logic        tx        // UART TX 핀
+    output logic        tx        // UART TX pin
 );
 
     localparam integer BIT_PERIOD = CLK_FREQ_HZ / BAUD_RATE;
@@ -27,7 +23,7 @@ module uart_tx #(
     state_t state;
 
     logic [CNT_WIDTH-1:0] bit_cnt;
-    logic [2:0]            data_idx; // 0~7
+    logic [2:0]            data_idx; // 0-7
     logic [7:0]             shift_reg;
 
     assign tx_busy = (state != IDLE);
@@ -38,9 +34,10 @@ module uart_tx #(
             bit_cnt   <= 0;
             data_idx  <= 0;
             shift_reg <= 8'b0;
-            tx        <= 1'b1;   // idle 상태는 항상 1 (UART 라인 idle level)
+            tx        <= 1'b1;   // line sits high when idle
         end else begin
             case (state)
+                // wait here until someone asks us to send a byte
                 IDLE: begin
                     tx <= 1'b1;
                     if (tx_start) begin
@@ -62,7 +59,7 @@ module uart_tx #(
                     end
                 end
 
-                // 데이터 8비트, LSB부터
+                // send the 8 data bits, LSB first
                 DATA: begin
                     tx <= shift_reg[data_idx];
                     if (bit_cnt == BIT_PERIOD - 1) begin

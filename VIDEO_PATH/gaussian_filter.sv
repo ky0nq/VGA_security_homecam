@@ -1,22 +1,10 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// box_blur_nxn_pipe
-//   WIN x WIN 균일 평균(box blur). en 없이 항상 블러링만 출력.
-//
-//   !!! 합산을 2단 파이프라인으로 분리함 !!!
-//   WIN*WIN(예: 400)개를 한 번에 더치는 대신,
-//     1단계: 줄(row)별로 WIN개씩 부분합 계산 + 레지스터
-//     2단계: 그 부분합 WIN개를 다시 더해 최종합 + 레지스터
-//   으로 나눠서 한 클럭당 덧셈 개수를 WIN개 수준으로 줄임.
-//   합성 시간이 오래 걸리거나 타이밍이 안 맞는 문제는 대부분
-//   "한 클럭 안에 곱셈/덧셈을 너무 많이 우겨넣었을 때" 생기는데,
-//   이렇게 단계를 나눠 레지스터로 끊어주는 게 표준적인 해결법
-// ============================================================
+// Blurs the picture by averaging a WIN x WIN block of pixels around each pixel.
 
 module gauss_filter_pipe #(
-    parameter int IMG_WIDTH = 800,  // 한 줄(H_Whole_line)당 pclk 틱 수
-    parameter int WIN       = 16    // 윈도우 한 변의 길이 (3,5,7...20 등 자유)
+    parameter int IMG_WIDTH = 800,  // pclk ticks per line (H_Whole_line)
+    parameter int WIN       = 16    // size of one side of the average window
 )(
     input  logic        clk,
     input  logic        rst_n,
@@ -31,10 +19,10 @@ module gauss_filter_pipe #(
 );
 
     localparam int WEIGHT_SUM = WIN * WIN;
-    // 합산이 2단계(row 부분합 + 최종합)로 늘어나서 +1
+    // +4 because the sum is split into 2 pipeline stages (row sum, then total sum)
     localparam int LATENCY    = (WIN - 1) * IMG_WIDTH + WIN + 4;
 
-    // ---------------- 로컬 pclk 생성 ----------------
+    // ---------------- make our own pixel clock enable ----------------
     logic pclk;
     pclk_gen U_PCLK_GEN (
         .clk   (clk),
@@ -42,17 +30,18 @@ module gauss_filter_pipe #(
         .pclk  (pclk)
     );
 
-    // ---------------- Stage 0: 입력 레지스터 ----------------
+    // ---------------- Stage 0: grab the incoming pixel ----------------
     logic [11:0] rgb_in_r;
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) rgb_in_r <= '0;
         else if (pclk) rgb_in_r <= i_rgb;
     end
 
-    // ---------------- row_stream[0..WIN-1] : 0=현재줄, WIN-1=WIN-1줄 위 ----------------
+    // row_stream[0] is the current line, row_stream[WIN-1] is WIN-1 lines above it
     logic [11:0] row_stream [0:WIN-1];
     assign row_stream[0] = rgb_in_r;
 
+    // one line buffer per extra row we need, each one delays by a full line
     genvar r;
     generate
         for (r = 1; r < WIN; r = r + 1) begin : gen_linebuf
@@ -70,7 +59,7 @@ module gauss_filter_pipe #(
         end
     endgenerate
 
-    // ---------------- col_tap[row][col] : col=0 방금 ~ col=WIN-1 WIN-1칸 전 ----------------
+    // col_tap[row][0] is the newest pixel on that row, col_tap[row][WIN-1] is WIN-1 pixels ago
     logic [11:0] col_tap [0:WIN-1][0:WIN-1];
 
     genvar rr;
@@ -88,7 +77,7 @@ module gauss_filter_pipe #(
         end
     endgenerate
 
-    // ---------------- 1단계 : 줄(row)별 부분합 (WIN개씩, 조합 -> 레지스터) ----------------
+    // ---------------- Stage 1 : add up WIN pixels per row, one adder per row ----------------
     logic [15:0] row_sum_r_c [0:WIN-1];
     logic [15:0] row_sum_g_c [0:WIN-1];
     logic [15:0] row_sum_b_c [0:WIN-1];
@@ -109,6 +98,7 @@ module gauss_filter_pipe #(
                     row_sum_b_c[rs] = row_sum_b_c[rs] + col_tap[rs][c][3:0];
                 end
             end
+            // register the row sum so we don't try to add everything in one clock
             always_ff @(posedge clk or negedge rst_n) begin
                 if (!rst_n) begin
                     row_sum_r[rs] <= '0;
@@ -123,7 +113,7 @@ module gauss_filter_pipe #(
         end
     endgenerate
 
-    // ---------------- 2단계 : row 부분합 WIN개를 최종 합산 (조합 -> 레지스터) ----------------
+    // ---------------- Stage 2 : add the WIN row sums into one final total ----------------
     logic [23:0] sum_r_c, sum_g_c, sum_b_c;
     logic [23:0] sum_r,   sum_g,   sum_b;
 
@@ -146,7 +136,7 @@ module gauss_filter_pipe #(
         end
     end
 
-    // ---------------- 정규화 + 출력 레지스터 ----------------
+    // ---------------- divide by the pixel count and register the output ----------------
     function automatic logic [3:0] normalize(input logic [23:0] sum);
         logic [23:0] avg;
         avg = sum / WEIGHT_SUM;
@@ -166,7 +156,7 @@ module gauss_filter_pipe #(
         end
     end
 
-    // ---------------- h_sync / v_sync 지연 ----------------
+    // ---------------- delay h_sync / v_sync to match the pixel delay above ----------------
     logic [LATENCY-1:0] h_sync_d, v_sync_d;
 
     always_ff @(posedge clk or negedge rst_n) begin

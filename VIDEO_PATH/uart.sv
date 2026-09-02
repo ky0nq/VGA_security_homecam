@@ -1,28 +1,24 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// uart
-//   uart_rx + uart_tx만 묶은 순수 송수신 모듈 (디코더 없음)
-//   rx_data/rx_done은 counter/decoder 등 뒷단 모듈이 직접 받아서 씀
-//   tx_data/tx_start도 뒷단(counter)에서 만들어서 그대로 넣어주면 됨
-// ============================================================
+// Puts the uart_rx and uart_tx modules together in one place.
+
 module uart #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
-    parameter integer BAUD_RATE   = 115200  // 상대 보드 송수신측이랑 반드시 일치해야 함
+    parameter integer BAUD_RATE   = 115200  // must match the baud rate on the other board
 )(
     input  logic clk,
     input  logic rst_n,
 
     // ---- RX ----
-    input  logic       rx,        // UART RX 핀 (외부 입력, 비동기)
+    input  logic       rx,        // UART RX pin, comes in from outside so it is not synced yet
     output logic [7:0] rx_data,
-    output logic        rx_done,   // 1클럭 펄스
+    output logic        rx_done,   // 1-clock pulse
 
     // ---- TX ----
     input  logic [7:0] tx_data,
-    input  logic        tx_start,  // 1클럭 펄스
+    input  logic        tx_start,  // 1-clock pulse
     output logic        tx_busy,
-    output logic        tx         // UART TX 핀
+    output logic        tx         // UART TX pin
 );
 
     uart_rx #(

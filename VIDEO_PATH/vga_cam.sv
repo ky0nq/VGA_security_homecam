@@ -1,51 +1,39 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// vga_cam
-//   OV7670 SCCB 초기화 + 캡처(320x240) -> Frame Buffer -> 2x 업스케일
-//   판독(zoom 포함) -> VGA 타이밍까지, "카메라"와 관련된 모든 걸 묶은 블록
-//
-//   내부 구성:
-//     SCCB_setup_CNTL    : 전원 인가 후 자동으로 OV7670 레지스터 초기화(I2C)
-//     OV7670_MemCNTL     : 카메라 픽셀(pclk 도메인) -> 프레임버퍼 write
-//     framebuffer        : 320x240 RGB565 저장 (dual clock BRAM)
-//     VGA_Decoder        : h_sync/v_sync/x_pixel/y_pixel/de 생성 (clk 도메인)
-//     rom_reader_upscale : 2x 업스케일 + zoom 판독, RGB565->RGB444 변환
-//
-// ============================================================
+// Puts camera setup, capture, frame buffer, and the zoom reader all together.
 
 module vga_cam #(
     parameter CLK_FREQ_HZ       = 100_000_000,
     parameter I2C_FREQ_HZ       = 100_000,
     parameter POWERUP_DELAY_MS  = 50
 ) (
-    input logic clk,      // 시스템 클럭 (VGA 타이밍/프레임버퍼 read/SCCB 쪽)
-    input logic pclk,     // OV7670 카메라 픽셀 클럭 (프레임버퍼 write 쪽)
+    input logic clk,      // system clock, used for VGA timing, frame buffer read, and SCCB
+    input logic pclk,     // real OV7670 pixel clock, used for the frame buffer write side
     input logic rst_n,
 
-    // Zoom 컨트롤
+    // zoom control
     input logic zoom_en,
     input logic zoom_r,
     input logic zoom_l,
     input logic zoom_d,
 
-    // SCCB (OV7670 레지스터 초기화)
+    // SCCB pins for setting up the camera registers
     output logic setup_busy,
     output logic setup_done,
     output logic setup_error,
     output logic cam_scl,
     inout  wire  cam_sda,
 
-    // OV7670 캡처 인터페이스
+    // OV7670 capture pins
     input logic       cam_href,
     input logic       cam_vsync,
     input logic [7:0] cam_data,
 
-    // 출력
+    // output
     output logic        o_h_sync,
     output logic        o_v_sync,
     output logic [11:0] o_rgb,
-    output logic        xclk       // OV7670 XCLK 핀 공급용
+    output logic        xclk       // clock we send to the camera's XCLK pin
 );
 
     localparam IMG_W = 320;
@@ -58,7 +46,7 @@ module vga_cam #(
     localparam integer POWERUP_CNT_WIDTH = $clog2(POWERUP_DELAY_CYCLES);
 
     //============================================================
-    // Camera XCLK (FPGA clk → 25MHz)
+    // Camera XCLK, made from clk divided down to 25MHz
     //============================================================
     pclk_gen U_CAM_CLK_GEN (
         .clk  (clk),
@@ -67,7 +55,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // 전원 인가 후 자동으로 SCCB 초기화 1회 시작
+    // wait a bit after power on, then start the SCCB setup once
     //============================================================
     logic [POWERUP_CNT_WIDTH-1:0] powerup_cnt;
     logic                         setup_start_auto;
@@ -106,7 +94,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // Internal Signal
+    // wires used between the blocks below
     //============================================================
     logic              we;
     logic [    AW-1:0] wAddr;
@@ -121,7 +109,7 @@ module vga_cam #(
     logic              w_v_sync;
 
     //============================================================
-    // OV7670 Memory Controller (pclk 도메인)
+    // writes camera pixels into the frame buffer (pclk domain)
     //============================================================
     OV7670_MemCNTL #(
         .IMG_W(IMG_W),
@@ -139,7 +127,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // Frame Buffer (write: pclk 도메인 / read: clk 도메인)
+    // the frame buffer itself (write side pclk, read side clk)
     //============================================================
     framebuffer #(
         .IMG_W(IMG_W),
@@ -156,7 +144,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // VGA Timing Generator (clk 도메인)
+    // VGA timing generator (clk domain)
     //============================================================
     VGA_Decoder U_VGA_DEC (
         .clk    (clk),
@@ -169,7 +157,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // 2x 업스케일 + Zoom 판독
+    // reads the frame buffer at 2x size and applies the zoom area
     //============================================================
     rom_reader_upscale U_READER_UPSCALE (
         .clk    (clk),
@@ -187,7 +175,7 @@ module vga_cam #(
     );
 
     //============================================================
-    // h_sync/v_sync : rom_reader_upscale의 dispArea_d와 동일하게 1클럭 지연
+    // delay h_sync/v_sync by 1 clock to line up with rom_reader_upscale's own delay
     //============================================================
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin

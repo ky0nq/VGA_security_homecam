@@ -1,18 +1,6 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// uart_link
-//   uart(rx+tx) + counter_10s(10초 무응답 감지) + uart_decoder(비트 분해)
-//   를 묶어서, 물리 rx/tx 핀만 연결하면 최종 디코딩된 신호들이
-//   바로 나오는 최상위 통신 블록
-//
-//   흐름:
-//     rx 핀 -> uart -> rx_data/rx_done
-//                        │              └─▶ uart_decoder ──▶ zoom_en 등, unlock_en
-//                        └─▶ counter_10s ──▶ done_10s ──┬─▶ (lock_force로) uart_decoder
-//                                        └─▶ data_10s ──┼─▶ (tx_data로)   uart -> tx 핀
-//                                                        └─▶ (tx_start로) uart -> tx 핀
-// ============================================================
+// Puts uart, counter_10s, and uart_decoder together into one communication block.
 
 module uart_link #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
@@ -21,8 +9,8 @@ module uart_link #(
     input  logic clk,
     input  logic rst_n,
 
-    input  logic rx,    // UART RX 핀
-    output logic tx,    // UART TX 핀
+    input  logic rx,    // UART RX pin
+    output logic tx,    // UART TX pin
 
     output logic zoom_en,
     output logic effect_sel,
@@ -30,11 +18,11 @@ module uart_link #(
     output logic btn_r,
     output logic btn_d,
     output logic btn_u_pulse,
-    output logic unlock_en    // forced_lock까지 반영된 최종값
+    output logic unlock_en    // final value, already includes the forced_lock check
 );
 
     //============================================================
-    // uart : rx+tx 물리 계층
+    // uart : the raw byte send/receive layer
     //============================================================
     logic [7:0] rx_data;
     logic        rx_done;
@@ -58,7 +46,7 @@ module uart_link #(
     );
 
     //============================================================
-    // counter_10s : 10초 무응답 감지
+    // counter_10s : watches for 10 seconds of silence
     //============================================================
     logic       done_10s;
     logic [7:0] data_10s;
@@ -73,11 +61,11 @@ module uart_link #(
         .data_10s(data_10s)
     );
 
-    assign tx_data  = data_10s;   // counter_10s가 만든 바이트를 그대로 TX 데이터로
-    assign tx_start = done_10s;   // "10초 도달" 이벤트를 TX 트리거로도 그대로 사용
+    assign tx_data  = data_10s;   // send whatever counter_10s built as the TX byte
+    assign tx_start = done_10s;   // and use the same "10s reached" pulse to trigger it
 
     //============================================================
-    // uart_decoder : 비트 분해 + forced_lock 반영
+    // uart_decoder : splits the byte into signals, applies forced_lock
     //============================================================
     uart_decoder U_UART_DECODER (
         .clk        (clk),

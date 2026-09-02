@@ -1,39 +1,42 @@
 `timescale 1ns / 1ps
 
+// Simple I2C/SCCB master. Sends one register write (address + data) to the camera.
+
 module I2C_master #(
-    parameter integer CLK_FREQ_HZ = 100_000_000,  // FPGA Clock
-    parameter integer I2C_FREQ_HZ = 100_000       // SCCB SCL Frequency
+    parameter integer CLK_FREQ_HZ = 100_000_000,  // FPGA clock
+    parameter integer I2C_FREQ_HZ = 100_000       // SCCB SCL frequency
 )(
     input  logic       clk,
     input  logic       rst_n,
 
-    // OV7670 Setup Controller에서 1-clock pulse
+    // 1-clock pulse from the setup controller, tells us to start a write
     input  logic       start,
 
-    // 8-bit Device Address
-    // OV7670 Write = 8'h42
+    // 8-bit device address (OV7670 write address = 8'h42)
     input  logic [7:0] dev_addr,
 
-    // Register Address / Data
+    // register address / data to write
     input  logic [7:0] reg_addr,
     input  logic [7:0] reg_data,
 
-    // I2C Master -> OV7670 Setup Controller
+    // status back to the setup controller
     output logic       busy,
     output logic       done,
     output logic       ack_error,
 
-    // SCCB Interface
+    // SCCB pins
     output logic       scl,
     inout  wire        sda
 );
 
+    // divide the clock down so scl toggles at I2C_FREQ_HZ, 4 steps per bit
     localparam integer TICK_DIV_CALC = CLK_FREQ_HZ / (I2C_FREQ_HZ * 4);
     localparam integer TICK_DIV = (TICK_DIV_CALC < 1) ? 1 : TICK_DIV_CALC;
     localparam integer CLK_CNT_WIDTH = (TICK_DIV <= 1) ? 1 : $clog2(TICK_DIV);
 
     logic [CLK_CNT_WIDTH-1:0] clk_cnt;
 
+    // one state per byte-phase of a standard I2C write transaction
     typedef enum logic [3:0] {
         IDLE,
         START,
@@ -48,14 +51,14 @@ module I2C_master #(
     } state_e;
     state_e state;
 
-    logic [1:0] step;
-    logic [2:0] bit_cnt;
+    logic [1:0] step;      // 4 sub-steps inside one bit period
+    logic [2:0] bit_cnt;   // which bit (0-7) we are sending
     logic [7:0] tx_shift_r;
     logic [7:0] dev_addr_r;
     logic [7:0] reg_addr_r;
     logic [7:0] reg_data_r;
 
-    // SDA open-drain
+    // sda is open-drain: we only ever pull it low or let it float
     logic sda_drive_low;
     assign sda = sda_drive_low ? 1'b0 : 1'bz;
 
@@ -79,8 +82,9 @@ module I2C_master #(
         end
 
         else begin
-            done <= 1'b0;
+            done <= 1'b0;  // done is only high for 1 clock
             case (state)
+                // wait here until the setup controller asks for a write
                 IDLE : begin
                     busy          <= 1'b0;
                     scl           <= 1'b1;
@@ -99,6 +103,7 @@ module I2C_master #(
                     end
                 end
 
+                // start condition: pull sda low while scl is still high
                 START : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -132,7 +137,8 @@ module I2C_master #(
                         clk_cnt <= clk_cnt + 1'b1;
                     end
                 end
-                
+
+                // send the 8-bit device address, MSB first
                 DEV_ADDR : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -169,6 +175,7 @@ module I2C_master #(
                     end
                 end
 
+                // check the ack bit from the camera after the device address
                 DEV_ACK : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -185,7 +192,7 @@ module I2C_master #(
                             2'd2 : begin
                                 scl <= 1'b1;
                                 if (sda == 1'b1) begin
-                                    ack_error <= 1'b1;
+                                    ack_error <= 1'b1;   // camera did not pull sda low
                                 end
                                 step <= 2'd3;
                             end
@@ -203,6 +210,7 @@ module I2C_master #(
                     end
                 end
 
+                // send the register address byte
                 REG_ADDR : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -239,6 +247,7 @@ module I2C_master #(
                     end
                 end
 
+                // ack after the register address
                 REG_ACK : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -273,6 +282,7 @@ module I2C_master #(
                     end
                 end
 
+                // send the data byte
                 REG_DATA : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -309,6 +319,7 @@ module I2C_master #(
                     end
                 end
 
+                // ack after the data byte, last one for this write
                 DATA_ACK : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -341,6 +352,7 @@ module I2C_master #(
                     end
                 end
 
+                // stop condition: let sda go high while scl is high
                 STOP : begin
                     if (clk_cnt == TICK_DIV - 1) begin
                         clk_cnt <= '0;
@@ -373,6 +385,7 @@ module I2C_master #(
                     end
                 end
 
+                // one write is finished, tell the setup controller and go back to idle
                 DONE : begin
                     busy <= 1'b0;
                     done <= 1'b1;

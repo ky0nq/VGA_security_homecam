@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+// Runs the camera setup: waits after power on, then starts the setup FSM and I2C master.
+
 module SCCB_setup_CNTL #(
     parameter CLK_FREQ_HZ = 100_000_000,
     parameter I2C_FREQ_HZ = 100_000
@@ -17,6 +19,7 @@ module SCCB_setup_CNTL #(
     inout  wire  sda
 );
 
+    // wires between the two inner blocks
     logic       i2c_start;
 
     logic [7:0] dev_addr;
@@ -27,9 +30,10 @@ module SCCB_setup_CNTL #(
     logic       i2c_done;
     logic       i2c_ack_error;
 
+    // decides which register to send next
     OV7670_setup_CNTL #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ)
-    ) U_OV7670_SETUP_CNTL (    
+    ) U_OV7670_SETUP_CNTL (
         .clk        (clk),
         .rst_n      (rst_n),
         .setup_start(setup_start),
@@ -50,6 +54,7 @@ module SCCB_setup_CNTL #(
         .setup_error(setup_error)
     );
 
+    // actually sends the byte over SCCB
     I2C_master #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .I2C_FREQ_HZ(I2C_FREQ_HZ)

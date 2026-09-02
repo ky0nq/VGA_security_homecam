@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
 
+// Wraps the pixel clock, the pixel counter, and the sync generator into one block.
 module VGA_Decoder (
     input  logic       clk,
     input  logic       rst_n,
@@ -40,6 +41,7 @@ module VGA_Decoder (
 
 endmodule
 
+// Turns h_count/v_count into h_sync, v_sync, and the visible area flag (de).
 module vga_decoder (
 	input logic [9:0] h_count,
 	input logic [9:0] v_count,
@@ -49,27 +51,29 @@ module vga_decoder (
 	output logic [9:0] y_pixel,
 	output logic de
 );
-	
-	localparam H_Visible_area   = 640;   
-	localparam H_Front_porch    =  16;    
-	localparam H_Sync_pulse     =  96;   
-	localparam H_Back_porch     =  48;   
-	localparam H_Whole_line     = 800; 
+	// standard 640x480 @ 60Hz VGA timing numbers
+	localparam H_Visible_area   = 640;
+	localparam H_Front_porch    =  16;
+	localparam H_Sync_pulse     =  96;
+	localparam H_Back_porch     =  48;
+	localparam H_Whole_line     = 800;
 
-	localparam V_Visible_area   = 480;   
-	localparam V_Front_porch    =  10;   
-	localparam V_Sync_pulse     =   2;   
-	localparam V_Back_porch     =  33;  
-	localparam V_Whole_frame    = 525;   
-	
+	localparam V_Visible_area   = 480;
+	localparam V_Front_porch    =  10;
+	localparam V_Sync_pulse     =   2;
+	localparam V_Back_porch     =  33;
+	localparam V_Whole_frame    = 525;
+
 	assign x_pixel = h_count;
 	assign y_pixel = v_count;
-	
+
+	// sync pulse is active low, high everywhere except the sync pulse window
 	assign h_sync = !((h_count >= (H_Visible_area + H_Front_porch))
              && (h_count <  (H_Visible_area + H_Front_porch + H_Sync_pulse)));
 	assign v_sync = !((v_count >= (V_Visible_area + V_Front_porch))
                && (v_count <  (V_Visible_area + V_Front_porch + V_Sync_pulse)));
-  assign de = (h_count < H_Visible_area) && (v_count < V_Visible_area);
-  
-	
+
+	// de is high only inside the visible picture area
+	assign de = (h_count < H_Visible_area) && (v_count < V_Visible_area);
+
 endmodule

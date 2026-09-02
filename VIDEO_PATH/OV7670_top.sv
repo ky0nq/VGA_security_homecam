@@ -1,10 +1,6 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// OV7670_top
-//   uart_link(통신+10초 타임아웃+디코딩) -> video_path(카메라+필터체인)
-//   -> vga_outreg(채널분리+최종 출력 레지스터) -> 물리 VGA 핀
-// ============================================================
+// Top module. Connects uart_link, video_path, and vga_outreg to the board pins.
 
 module OV7670_top #(
     parameter integer CLK_FREQ_HZ = 100_000_000,
@@ -13,27 +9,27 @@ module OV7670_top #(
     input logic clk,
     input logic rst_n,
 
-    // UART (트래킹 보드와 통신)
+    // UART link to the tracking board
     input  logic uart_rx,
     output logic uart_tx,
 
-    // OV7670 캡처 인터페이스
-    input  logic       pclk,       // OV7670이 실제로 내보내는 픽셀 클럭 (물리 핀)
+    // OV7670 capture pins
+    input  logic       pclk,       // real pixel clock coming out of the camera
     input  logic       cam_href,
     input  logic       cam_vsync,
     input  logic [7:0] cam_data,
     output logic       xclk,
 
-    // SCCB (OV7670 레지스터 초기화)
+    // SCCB pins used to set up the camera registers
     output logic setup_busy,
     output logic setup_done,
     output logic setup_error,
     output logic cam_scl,
     inout  wire  cam_sda,
 
-    output logic unlock_en,   // uart_link의 unlock_en
+    output logic unlock_en,   // unlock_en coming from uart_link
 
-    // VGA 출력
+    // VGA output pins
     output logic       h_sync,
     output logic       v_sync,
     output logic [3:0] port_red,
@@ -42,9 +38,8 @@ module OV7670_top #(
 );
 
     //============================================================
-    // uart_link : 통신 + 10초 무응답 감지 + 비트 디코딩
+    // uart_link : UART + 10 second silence watchdog + byte decoding
     //============================================================
-    // logic unlock_en;
     logic zoom_en;
     logic effect_sel;
     logic btn_l, btn_r, btn_d;
@@ -68,7 +63,7 @@ module OV7670_top #(
     );
 
     //============================================================
-    // video_path : SCCB + 캡처 + 프레임버퍼 + 줌 + 필터 체인
+    // video_path : camera setup + capture + frame buffer + zoom + filters
     //============================================================
     logic        vp_h_sync;
     logic        vp_v_sync;
@@ -76,7 +71,7 @@ module OV7670_top #(
 
     video_path U_VIDEO_PATH (
         .clk        (clk),
-        .pclk       (pclk),       // 카메라 물리 PCLK 핀 그대로 전달
+        .pclk       (pclk),       // pass the real camera pixel clock straight through
         .rst_n      (rst_n),
         .unlock_en  (unlock_en),
         .zoom_en    (zoom_en),
@@ -100,7 +95,7 @@ module OV7670_top #(
     );
 
     //============================================================
-    // vga_outreg : 채널 분리(RGB444 -> 4/4/4) + 최종 출력 레지스터
+    // vga_outreg : split RGB444 into 4/4/4 and register the final output
     //============================================================
     logic [11:0] out_rgb;
 

@@ -1,9 +1,6 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// filter_apply
-//   pink / orange / blue / gray / gamma / night 필터를 순서대로 체인 연결
-// ============================================================
+// Chains all the color and tone filters together in a fixed order.
 
 module filter_apply (
     input logic clk,
@@ -26,7 +23,7 @@ module filter_apply (
     output logic [11:0] o_rgb
 );
 
-    // 스테이지 사이를 잇는 중간 신호들
+    // wires that carry the picture from one filter to the next
     logic        pink_h_sync,   pink_v_sync;
     logic [11:0] pink_rgb;
 
@@ -43,7 +40,8 @@ module filter_apply (
     logic [11:0] gamma_rgb;
 
     //============================================================
-    // i_rgb → pink → orange → blue → gray → gamma → night → o_rgb
+    // i_rgb -> pink -> orange -> blue -> gray -> gamma -> night -> o_rgb
+    // each filter just passes the picture through if its own enable is low
     //============================================================
     pink_filter_pipe U_PINK (
         .clk     (clk),
