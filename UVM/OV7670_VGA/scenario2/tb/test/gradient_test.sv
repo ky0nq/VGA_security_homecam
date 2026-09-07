@@ -1,7 +1,7 @@
 `ifndef GRADIENT_TEST_SV
 `define GRADIENT_TEST_SV
 //======================================================================
-//  gradient_test : 그라디언트 프레임 (PIPE 튜닝 확인용)
+// gradient_test : gradient frame (for PIPE tuning verification)
 //======================================================================
 class gradient_test extends base_test;
   `uvm_component_utils(gradient_test)
