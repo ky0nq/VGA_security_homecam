@@ -1,7 +1,9 @@
+```systemverilog
 `timescale 1ns/1ps
 `include "defs.svh"
 //======================================================================
-//  hdl_top : clk/reset/pclk 생성 + DUT + 인터페이스 바인딩 + run_test()
+//  hdl_top : generates clk/reset/pclk + instantiates DUT
+//            + binds interfaces + calls run_test()
 //======================================================================
 module hdl_top;
   import uvm_pkg::*;
@@ -14,7 +16,7 @@ module hdl_top;
   logic reset = 1'b1;
 
   always #5              clk  = ~clk;    // 100 MHz
-  always #(`CAM_PCLK/2)  pclk = ~pclk;   // 카메라 PCLK (시뮬 전용)
+  always #(`CAM_PCLK/2)  pclk = ~pclk;   // Camera PCLK (simulation only)
 
   initial begin
     reset = 1'b1;
@@ -49,7 +51,7 @@ module hdl_top;
     .port_blue   (pb)
   );
 
-  // ---- config_db : 가상 인터페이스 배포 ----
+  // ---- config_db : distribute virtual interfaces ----
   initial begin
     uvm_config_db#(virtual ov7670_if   )::set(null, "*", "cam_vif",  cam_if);
     uvm_config_db#(virtual sccb_if     )::set(null, "*", "sccb_vif", sccb_if_i);
@@ -57,15 +59,16 @@ module hdl_top;
     run_test();
   end
 
-  // ---- 파형 덤프 (옵션) :  ./simv +DUMP   (Verdi FSDB) ----
+  // ---- waveform dump (optional) : ./simv +DUMP   (Verdi FSDB) ----
   initial if ($test$plusargs("DUMP")) begin
     $fsdbDumpfile("novas.fsdb");
     $fsdbDumpvars(0, hdl_top, "+all");
   end
 
-  // ---- 안전 타임아웃 ----
+  // ---- safety timeout ----
   initial begin
     #(200_000_000);   // 200 ms
-    `uvm_fatal("TIMEOUT", "시뮬 타임아웃")
+    `uvm_fatal("TIMEOUT", "Simulation timeout")
   end
 endmodule
+```
