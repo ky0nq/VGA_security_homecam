@@ -1,21 +1,22 @@
 `timescale 1ns / 1ps
 
-// 두 보드 공통으로 쓰는 UI 블록.
-// VGA 파이프라인 맨 끝(최종 출력 레지스터 직전)에 그대로 끼워 넣으면 된다.
+// =================================================================================
+// Module: ui_frame_wrapper
+// Description: Wrapper module instantiating sync tracking, label ROM lookup, 
+//              and frame overlay logic for video output processing.
 //
-//   ... -> ui_frame_wrapper -> (vga_outreg) -> VGA 핀
-//
-// 들어오는 h_sync/v_sync로 좌표를 복원하므로 앞단 지연이 몇 클럭이든 상관없다.
-//
-//   보드1(Board A, 트래킹) : LABEL_ID=0, LABEL_W=78  -> "단말기"
-//   보드2(Board B, 홈캠)   : LABEL_ID=1, LABEL_W=52  -> "홈캠"
+// Features:
+//   - Reconstructs active video coordinates (X, Y) and DE from incoming H/V Sync signals.
+//   - Integrates UI overlay (Border & Label text box).
+//   - Aligns H/V Sync output delay (2 clock cycles) with `ui_frame_overlay` latency.
+// =================================================================================
 
 module ui_frame_wrapper #(
-    parameter int          LABEL_ID     = 0,
-    parameter int          LABEL_W      = 78,
-    parameter int          BORDER_PX    = 4,
-    parameter logic [11:0] BORDER_COLOR = 12'hFFF,
-    parameter string       LABEL_MEM    = "ui_labels.mem"
+    parameter int          LABEL_ID     = 0,            // 0: Terminal, 1: Home Cam
+    parameter int          LABEL_W      = 78,           // Label text width in pixels
+    parameter int          BORDER_PX    = 4,            // Outer border thickness
+    parameter logic [11:0] BORDER_COLOR = 12'hFFF,      // Border color (RGB444)
+    parameter string       LABEL_MEM    = "ui_labels.mem" // Memory init file path
 ) (
     input  logic        clk,
     input  logic        rst_n,
@@ -29,6 +30,7 @@ module ui_frame_wrapper #(
     output logic [11:0] o_rgb
 );
 
+    // VGA Coordinate Recovery Tracker
     logic       de;
     logic [9:0] x, y;
 
@@ -42,11 +44,14 @@ module ui_frame_wrapper #(
         .o_y     (y)
     );
 
+    // Label ROM Interface Signals
     logic       label_sel, label_pixel;
     logic [6:0] label_x;
     logic [4:0] label_y;
 
-    ui_label_rom #(.MEM_FILE(LABEL_MEM)) U_LABEL_ROM (
+    ui_label_rom #(
+        .MEM_FILE(LABEL_MEM)
+    ) U_LABEL_ROM (
         .clk    (clk),
         .i_label(label_sel),
         .i_x    (label_x),
@@ -54,6 +59,7 @@ module ui_frame_wrapper #(
         .o_pixel(label_pixel)
     );
 
+    // UI Frame Overlay Core Module
     ui_frame_overlay #(
         .LABEL_ID    (LABEL_ID),
         .LABEL_W     (LABEL_W),
@@ -73,7 +79,7 @@ module ui_frame_wrapper #(
         .o_rgb        (o_rgb)
     );
 
-    // 오버레이가 2클럭 지연시키므로 sync도 같이 지연
+    // 2-Clock Sync Signal Delay Match (Matches 2-cycle latency of U_OVERLAY)
     logic h_sync_q1, v_sync_q1;
 
     always_ff @(posedge clk or negedge rst_n) begin
