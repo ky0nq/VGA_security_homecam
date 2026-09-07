@@ -1,7 +1,7 @@
 `ifndef SCCB_MONITOR_SV
 `define SCCB_MONITOR_SV
 //======================================================================
-//  sccb_monitor : START -> [8bit + ACK]x3 -> STOP 디코드
+//  sccb_monitor : decodes START -> [8-bit + ACK]x3 -> STOP
 //======================================================================
 class sccb_monitor extends uvm_monitor;
   `uvm_component_utils(sccb_monitor)
@@ -15,7 +15,7 @@ class sccb_monitor extends uvm_monitor;
 
   function void build_phase(uvm_phase phase);
     if (!uvm_config_db#(virtual sccb_if)::get(this, "", "sccb_vif", vif))
-      `uvm_fatal("SCCBMON", "sccb_vif 설정 안 됨")
+      `uvm_fatal("SCCBMON", "sccb_vif is not configured")
   endfunction
 
   task run_phase(uvm_phase phase);
@@ -24,18 +24,22 @@ class sccb_monitor extends uvm_monitor;
 
   task collect_write();
     bit [7:0] b [3];
-    // START : SIOC high 인 동안 SIOD 하강
+
+    // START : SIOD falling edge while SIOC is high
     @(negedge vif.siod);
-    if (vif.sioc !== 1'b1) return;          // 데이터 비트 변화였음 -> 재시도
+    if (vif.sioc !== 1'b1) return;          // Data bit transition -> retry
+
     for (int i = 0; i < 3; i++) begin
       for (int k = 0; k < 8; k++) begin
         @(posedge vif.sioc);
         b[i][7-k] = vif.siod;
       end
-      @(posedge vif.sioc);                  // 9번째(ACK) 클럭
+      @(posedge vif.sioc);                  // 9th clock (ACK)
     end
-    // STOP : SIOC high 인 동안 SIOD 상승
+
+    // STOP : SIOD rising edge while SIOC is high
     @(posedge vif.siod iff (vif.sioc === 1'b1));
+
     begin
       sccb_txn t = sccb_txn::type_id::create("t");
       t.id   = b[0];
