@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 //======================================================================
-//  sccb_if : SCCB 버스 (관측만).
-//    open-drain 이므로 tri1 (미구동 시 1, low 로 끌면 0).
+// sccb_if : SCCB bus (monitoring only).
+//   Uses tri1 for open-drain behavior (defaults to 1 when undriven, pulled low to drive 0).
 //======================================================================
 interface sccb_if ();
   tri1 sioc;
