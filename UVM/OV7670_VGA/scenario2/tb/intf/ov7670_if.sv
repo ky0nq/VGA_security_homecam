@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 //======================================================================
-//  ov7670_if : 카메라 픽셀 스트림 (TB 가 구동) + scale2x
+// ov7670_if : camera pixel stream (driven by the testbench) + scale2x
 //======================================================================
 interface ov7670_if (input logic pclk);
   logic       href    = 1'b0;
