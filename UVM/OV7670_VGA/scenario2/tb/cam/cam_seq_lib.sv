@@ -1,7 +1,7 @@
 `ifndef CAM_SEQ_LIB_SV
 `define CAM_SEQ_LIB_SV
 //======================================================================
-//  cam 시퀀스 라이브러리
+//  cam sequence library
 //======================================================================
 class solid_frame_seq extends uvm_sequence #(cam_frame_item);
   `uvm_object_utils(solid_frame_seq)
