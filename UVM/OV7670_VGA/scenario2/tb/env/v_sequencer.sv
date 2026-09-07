@@ -1,7 +1,7 @@
 `ifndef V_SEQUENCER_SV
 `define V_SEQUENCER_SV
 //======================================================================
-//  v_sequencer : virtual sequencer (cam_sequencer 핸들 보유)
+//  v_sequencer : virtual sequencer (cam_sequencer handle)
 //======================================================================
 class v_sequencer extends uvm_sequencer;
   `uvm_component_utils(v_sequencer)
