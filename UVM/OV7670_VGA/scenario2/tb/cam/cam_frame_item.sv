@@ -1,7 +1,7 @@
 `ifndef CAM_FRAME_ITEM_SV
 `define CAM_FRAME_ITEM_SV
 //======================================================================
-//  cam_frame_item : 카메라 한 프레임 (RGB565)
+//  cam_frame_item : camera one frame (RGB565)
 //======================================================================
 class cam_frame_item extends uvm_sequence_item;
   int        H = `CAM_H;
