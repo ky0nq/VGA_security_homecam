@@ -1,11 +1,11 @@
 `timescale 1ns / 1ps
 
-// 한글 라벨 비트맵 ROM.
-//   label 0 = "단말기" (보드1 / Board A)
-//   label 1 = "홈캠"   (보드2 / Board B)
+// Label bitmap ROM.
+//   label 0 = "Terminal" (Board 1 / Board A)
+//   label 1 = "HomeCam"  (Board 2 / Board B)
 //
-// 슬롯 128x32 고정이라 주소가 {label, y, x} 연결만으로 만들어진다(곱셈 없음).
-// 읽기는 1클럭 지연.
+// Fixed 128x32 slot size allows direct address mapping via {label, y, x} concat (no multipliers).
+// Read latency is 1 clock cycle.
 
 module ui_label_rom #(
     parameter string MEM_FILE = "ui_labels.mem"
@@ -14,7 +14,7 @@ module ui_label_rom #(
     input  logic       i_label,
     input  logic [6:0] i_x,      // 0~127
     input  logic [4:0] i_y,      // 0~31
-    output logic       o_pixel   // 1 = 글자 픽셀
+    output logic       o_pixel   // 1 = Text pixel
 );
 
     localparam int SLOT_W    = 128;
