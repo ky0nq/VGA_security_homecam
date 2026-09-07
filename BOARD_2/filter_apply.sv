@@ -1,32 +1,33 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// filter_apply
-//   pink / orange / blue / gray / gamma / night 필터를 순서대로 체인 연결
-// ============================================================
+// =================================================================================
+// Module: filter_apply
+// Description: Chains multiple video color/effect filters in series.
+// Data Flow: Input RGB -> Pink -> Orange -> Blue -> Gray -> Gamma -> Night -> Output RGB
+// =================================================================================
 
 module filter_apply (
-    input logic clk,
-    input logic rst_n,
+    input  logic        clk,
+    input  logic        rst_n,
 
-    input logic        i_h_sync,
-    input logic        i_v_sync,
-    input logic [11:0] i_rgb,
+    input  logic        i_h_sync,
+    input  logic        i_v_sync,
+    input  logic [11:0] i_rgb,
 
-    input logic pink_en,
-    input logic orange_en,
-    input logic blue_en,
-    input logic gray_en,
-    input logic gamma_en,
-    input logic gamma_level,
-    input logic night_en,
+    input  logic        pink_en,
+    input  logic        orange_en,
+    input  logic        blue_en,
+    input  logic        gray_en,
+    input  logic        gamma_en,
+    input  logic        gamma_level,
+    input  logic        night_en,
 
     output logic        o_h_sync,
     output logic        o_v_sync,
     output logic [11:0] o_rgb
 );
 
-    // 스테이지 사이를 잇는 중간 신호들
+    // Intermediate pipeline signals
     logic        pink_h_sync,   pink_v_sync;
     logic [11:0] pink_rgb;
 
@@ -42,9 +43,7 @@ module filter_apply (
     logic        gamma_h_sync,  gamma_v_sync;
     logic [11:0] gamma_rgb;
 
-    //============================================================
-    // i_rgb → pink → orange → blue → gray → gamma → night → o_rgb
-    //============================================================
+    // 1. Pink Filter
     pink_filter_pipe U_PINK (
         .clk     (clk),
         .rst_n   (rst_n),
@@ -57,6 +56,7 @@ module filter_apply (
         .o_rgb   (pink_rgb)
     );
 
+    // 2. Orange Filter
     orange_filter_pipe U_ORANGE (
         .clk       (clk),
         .rst_n     (rst_n),
@@ -69,6 +69,7 @@ module filter_apply (
         .o_rgb     (orange_rgb)
     );
 
+    // 3. Blue Filter
     blue_filter_pipe U_BLUE (
         .clk     (clk),
         .rst_n   (rst_n),
@@ -81,6 +82,7 @@ module filter_apply (
         .o_rgb   (blue_rgb)
     );
 
+    // 4. Gray Filter
     gray_filter_pipe U_GRAY (
         .clk     (clk),
         .rst_n   (rst_n),
@@ -93,6 +95,7 @@ module filter_apply (
         .o_rgb   (gray_rgb)
     );
 
+    // 5. Gamma Correction Filter
     gamma_filter_pipe U_GAMMA (
         .clk        (clk),
         .rst_n      (rst_n),
@@ -106,16 +109,17 @@ module filter_apply (
         .o_rgb      (gamma_rgb)
     );
 
+    // 6. Night Vision / Dark Enhancement Filter
     night_filter_pipe U_NIGHT (
-        .clk      (clk),
-        .rst_n    (rst_n),
-        .night_en (night_en),
-        .i_h_sync (gamma_h_sync),
-        .i_v_sync (gamma_v_sync),
-        .i_rgb    (gamma_rgb),
-        .o_h_sync (o_h_sync),
-        .o_v_sync (o_v_sync),
-        .o_rgb    (o_rgb)
+        .clk     (clk),
+        .rst_n   (rst_n),
+        .night_en(night_en),
+        .i_h_sync(gamma_h_sync),
+        .i_v_sync(gamma_v_sync),
+        .i_rgb   (gamma_rgb),
+        .o_h_sync(o_h_sync),
+        .o_v_sync(o_v_sync),
+        .o_rgb   (o_rgb)
     );
 
 endmodule
