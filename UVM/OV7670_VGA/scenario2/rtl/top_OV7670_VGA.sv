@@ -2,17 +2,16 @@
 module top_OV7670_VGA (
     input  logic        clk,            // 100MHz
     input  logic        reset,
-    input  logic        scale2x,        // 1 = 2배 확대(풀스크린), 0 = 원본 좌상단
+    input  logic        scale2x,        
 
     // OV7670
-    output logic        ov7670_xclk,    // 카메라로 주는 클럭
-    input  logic        ov7670_pclk,    // 카메라에서 오는 픽셀 클럭
+    output logic        ov7670_xclk,    
+    input  logic        ov7670_pclk,    
     input  logic        ov7670_href,
     input  logic        ov7670_vsync,
-    input  logic [7:0]  ov7670_data,    // D[7:0]
-    output logic        ov7670_sioc,    // SCCB clock (SIO_C)
-    inout  wire         ov7670_siod,    // SCCB data  (SIO_D, open-drain)
-//  RESET#, PWDN 는 카메라 모듈에서 3V3 / GND 로 고정
+    input  logic [7:0]  ov7670_data,    
+    output logic        ov7670_sioc,    
+    inout  wire         ov7670_siod,   
 
     // VGA
     output logic        h_sync,
@@ -26,19 +25,17 @@ module top_OV7670_VGA (
     localparam int V_ACT      = 240;
     localparam int ADDR_WIDTH = $clog2(320*240);
 
-    // 카메라 클럭 (100MHz/4 = 25MHz)
     OV7670_XCLK_gen #(.DIV(4)) U_XCLK (
         .clk   (clk),
         .reset (reset),
         .xclk  (ov7670_xclk)
     );
 
-    // SCCB 레지스터 초기화
     logic w_sccb_busy, w_sccb_done;
 
     SCCB_Controller #(
         .CLK_HZ(100_000_000), .SCL_HZ(100_000)
-    ) U_SCCB_CONTROLLER (          // 파워업하면 알아서 한 번 돎
+    ) U_SCCB_CONTROLLER (         
         .clk    (clk),
         .reset  (reset),
         .o_busy (w_sccb_busy),
@@ -47,7 +44,6 @@ module top_OV7670_VGA (
         .siod   (ov7670_siod)
     );
 
-    // 캡처 (pclk 도메인)
     logic                    w_we;
     logic [ADDR_WIDTH-1:0]   w_waddr;
     logic [15:0]             w_wdata;
@@ -81,7 +77,6 @@ module top_OV7670_VGA (
         .rdata (w_rdata)
     );
 
-    // VGA 타이밍 (clk 도메인)
     logic       w_h_sync, w_v_sync, w_de;
     logic [9:0] w_x, w_y;
 
@@ -112,7 +107,6 @@ module top_OV7670_VGA (
         .o_rgb   (w_rgb)
     );
 
-    // 출력 레지스터
     logic [11:0] w_rgb_r;
 
     VGA_OutReg U_VGA_OUTREG (
