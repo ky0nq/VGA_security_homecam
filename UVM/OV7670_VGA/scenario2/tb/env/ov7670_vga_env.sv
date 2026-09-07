@@ -1,7 +1,7 @@
 `ifndef OV7670_VGA_ENV_SV
 `define OV7670_VGA_ENV_SV
 //======================================================================
-//  ov7670_vga_env : 에이전트 3개 + predictor + scoreboard + v_sequencer
+//  ov7670_vga_env : agent 3 + predictor + scoreboard + v_sequencer
 //======================================================================
 class ov7670_vga_env extends uvm_env;
   `uvm_component_utils(ov7670_vga_env)
@@ -43,7 +43,9 @@ class ov7670_vga_env extends uvm_env;
     pred.exp_ap.connect(sb.exp_imp);
     vga.mon.ap.connect(sb.act_imp);
     sccb.mon.ap.connect(sb.sccb_imp);
-    // functional coverage : 같은 포트 공유
+    
+    // functional coverage : port sharing
+    
     cam.mon.ap.connect(cov.cam_imp);
     vga.mon.ap.connect(cov.act_imp);
     sccb.mon.ap.connect(cov.sccb_imp);
