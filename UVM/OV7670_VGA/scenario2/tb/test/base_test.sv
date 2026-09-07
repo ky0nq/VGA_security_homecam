@@ -1,7 +1,7 @@
 `ifndef BASE_TEST_SV
 `define BASE_TEST_SV
 //======================================================================
-//  base_test : solid green 프레임
+//  base_test : solid green frame
 //======================================================================
 class base_test extends uvm_test;
   `uvm_component_utils(base_test)
@@ -16,8 +16,8 @@ class base_test extends uvm_test;
     uvm_config_db#(env_cfg)::set(this, "env", "env_cfg", cfg);
     env = ov7670_vga_env::type_id::create("env", this);
   endfunction
-
-  // 파생 테스트가 override
+  
+  // Overridden by derived tests
   virtual function void configure(env_cfg c);
     c.scale2x       = 1'b0;
     c.warmup_frames = 2;
