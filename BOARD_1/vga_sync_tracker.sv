@@ -1,13 +1,12 @@
 `timescale 1ns / 1ps
 
-// 들어오는 h_sync/v_sync만 보고 화면 좌표(x, y, de)를 복원한다.
+// Recovers screen coordinates (x, y, de) purely from incoming h_sync/v_sync signals.
 //
-// video_path의 gauss / filter 갈래는 픽셀과 sync를 함께 지연시키므로,
-// 도착한 sync를 기준으로 좌표를 다시 만들면 앞단 파이프라인 지연이
-// 몇 클럭이든 자동으로 정렬된다. 덕분에 기존 모듈을 하나도 안 고치고
-// 파이프라인 맨 끝에 UI를 끼워넣을 수 있음.
+// Since upstream processing branches (like gaussian/filter) delay pixels and sync together,
+// reconstructing coordinates relative to incoming sync auto-aligns with any upstream delay.
+// This allows placing the UI at the end of the pipeline without modifying existing modules.
 //
-// 타이밍은 프로젝트의 vga_decoder.sv와 동일한 640x480@60 규격.
+// Timing matches standard 640x480@60Hz (same as vga_decoder.sv).
 
 module vga_sync_tracker (
     input  logic       clk,
@@ -26,9 +25,9 @@ module vga_sync_tracker (
     localparam int H_VISIBLE = 640;
     localparam int V_VISIBLE = 480;
 
-    // h_sync는 h_count 656~751 구간에서 low -> 752에서 상승
+    // h_sync goes low during h_count 656~751 -> rises at 752
     localparam int H_SYNC_END = 752;
-    // v_sync는 v_count 490~491 구간에서 low -> 492에서 상승
+    // v_sync goes low during v_count 490~491 -> rises at 492
     localparam int V_SYNC_END = 492;
 
     logic h_sync_q, v_sync_q;
@@ -47,7 +46,7 @@ module vga_sync_tracker (
     assign h_rise = i_h_sync & ~h_sync_q;
     assign v_rise = i_v_sync & ~v_sync_q;
 
-    // 픽셀 틱(25MHz). h_sync 상승마다 위상을 다시 맞춰 라인 단위로 자기보정된다.
+    // Pixel tick (25MHz). Resets phase on every h_sync rising edge to auto-correct per line.
     logic [1:0] phase;
     logic       tick;
 
