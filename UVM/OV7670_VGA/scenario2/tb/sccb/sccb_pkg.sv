@@ -1,7 +1,7 @@
 `ifndef SCCB_PKG_SV
 `define SCCB_PKG_SV
 //======================================================================
-//  sccb_pkg : SCCB 에이전트 패키지 (include 목록)
+//  sccb_pkg 
 //======================================================================
 package sccb_pkg;
   `include "uvm_macros.svh"
