@@ -1,14 +1,10 @@
 `timescale 1ns / 1ps
 
-// 두 보드 공통으로 쓰는 UI 블록.
-// VGA 파이프라인 맨 끝(최종 출력 레지스터 직전)에 그대로 끼워 넣으면 된다.
+// Common UI block for both boards.
+//   ... -> ui_frame_wrapper -> (vga_outreg) -> VGA pins
 //
-//   ... -> ui_frame_wrapper -> (vga_outreg) -> VGA 핀
-//
-// 들어오는 h_sync/v_sync로 좌표를 복원하므로 앞단 지연이 몇 클럭이든 상관없다.
-//
-//   보드1(Board A, 트래킹) : LABEL_ID=0, LABEL_W=78  -> "단말기"
-//   보드2(Board B, 홈캠)   : LABEL_ID=1, LABEL_W=52  -> "홈캠"
+//   Board 1 (Tracking) : LABEL_ID=0, LABEL_W=78  -> "단말기"
+//   Board 2 (Home cam) : LABEL_ID=1, LABEL_W=52  -> "홈캠"
 
 module ui_frame_wrapper #(
     parameter int          LABEL_ID     = 0,
@@ -73,7 +69,7 @@ module ui_frame_wrapper #(
         .o_rgb        (o_rgb)
     );
 
-    // 오버레이가 2클럭 지연시키므로 sync도 같이 지연
+    // The overlay adds a 2-clock delay, so delay the sync signals as well.
     logic h_sync_q1, v_sync_q1;
 
     always_ff @(posedge clk or negedge rst_n) begin
