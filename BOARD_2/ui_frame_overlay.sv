@@ -1,18 +1,23 @@
 `timescale 1ns / 1ps
 
-// 카메라 영상 위에 테두리 + 우측 상단 라벨(흰 바탕 / 검은 글자)만 그린다.
+// =================================================================================
+// Module: ui_frame_overlay
+// Description: Overlays a outer border and a text label box (White background / Black text)
+//              on top of live camera video streams.
 //
-// 파이프라인 2단 : ROM 주소 레지스터 1단 + ROM 읽기 1단.
-// (주소를 레지스터로 끊지 않으면 좌표 연산이 BRAM 주소까지 이어져 100MHz가 빠듯하다)
-// 따라서 o_rgb는 i_rgb 대비 2클럭 지연이고, wrapper가 sync도 2클럭 늦춘다.
+// Pipeline Architecture (2-Stage Delay):
+//   - Stage 1: Calculates pixel regions and registers label ROM addresses.
+//   - Stage 2: Synchronizes with ROM read latency and selects final output pixel color.
+// Latency: 2 Clock Cycles
+// =================================================================================
 
 module ui_frame_overlay #(
-    parameter int          LABEL_ID     = 0,        // 0=단말기, 1=홈캠
-    parameter int          LABEL_W      = 78,       // 글자 실제 폭 (gen_labels.py가 알려줌)
-    parameter int          BORDER_PX    = 4,        // 테두리 두께
-    parameter logic [11:0] BORDER_COLOR = 12'hFFF,  // 테두리 색
-    parameter int          MARGIN       = 8,        // 화면 가장자리 ~ 라벨 박스
-    parameter int          PAD          = 6         // 박스 안쪽 여백
+    parameter int          LABEL_ID     = 0,      // 0: Terminal, 1: Home Cam
+    parameter int          LABEL_W      = 78,     // Label text width in pixels
+    parameter int          BORDER_PX    = 4,      // Border thickness in pixels
+    parameter logic [11:0] BORDER_COLOR = 12'hFFF, // Border color (RGB444)
+    parameter int          MARGIN       = 8,      // Margin from screen edge to label box
+    parameter int          PAD          = 6       // Inner padding for label box
 ) (
     input  logic        clk,
     input  logic        rst_n,
@@ -22,7 +27,7 @@ module ui_frame_overlay #(
     input  logic [9:0]  i_y,
     input  logic [11:0] i_rgb,
 
-    // label ROM
+    // Label ROM Interface
     output logic        o_label_sel,
     output logic [6:0]  o_label_x,
     output logic [4:0]  o_label_y,
@@ -45,13 +50,11 @@ module ui_frame_overlay #(
     localparam logic [11:0] C_WHITE = 12'hFFF;
     localparam logic [11:0] C_BLACK = 12'h000;
 
-    localparam logic [1:0] K_PASS  = 2'd0;   // 카메라 영상 그대로
-    localparam logic [1:0] K_FILL  = 2'd1;   // 단색
-    localparam logic [1:0] K_LABEL = 2'd2;   // 흰 바탕 + 검은 글자
+    localparam logic [1:0] K_PASS  = 2'd0; // Pass-through camera video
+    localparam logic [1:0] K_FILL  = 2'd1; // Solid color fill
+    localparam logic [1:0] K_LABEL = 2'd2; // Text label overlay
 
-    //============================================================
-    // 픽셀 판정 (조합)
-    //============================================================
+    // Pixel Region Classification Signals
     logic [1:0]  kind;
     logic [11:0] fill;
     logic        lbl_sel_c;
@@ -60,6 +63,7 @@ module ui_frame_overlay #(
 
     logic in_border, in_box, in_text;
 
+    // Region Detection Combinational Logic
     always_comb begin
         in_border = (i_x < BORDER_PX) || (i_x >= SCREEN_W - BORDER_PX) ||
                     (i_y < BORDER_PX) || (i_y >= SCREEN_H - BORDER_PX);
@@ -79,23 +83,21 @@ module ui_frame_overlay #(
 
         if (!i_de) begin
             kind = K_FILL;
-            fill = C_BLACK;              // 블랭킹 구간은 반드시 0
+            fill = C_BLACK;        // Force black during blanking intervals
         end else if (in_border) begin
             kind = K_FILL;
             fill = BORDER_COLOR;
         end else if (in_box) begin
             if (in_text) begin
-                kind = K_LABEL;          // ROM 응답에 따라 검정/흰색
+                kind = K_LABEL;    // Render label text via ROM lookup
             end else begin
                 kind = K_FILL;
-                fill = C_WHITE;          // 박스 여백
+                fill = C_WHITE;    // Box padding background
             end
         end
     end
 
-    //============================================================
-    // Stage 1 : ROM 주소 레지스터
-    //============================================================
+    // Stage 1: Label ROM Address Register
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             o_label_sel <= 1'b0;
@@ -108,11 +110,10 @@ module ui_frame_overlay #(
         end
     end
 
-    //============================================================
-    // 판정 결과는 2단 지연 (주소 레지스터 + ROM 읽기)
-    //============================================================
+    // Control and Pixel Data Pipeline (2-Clock Pipeline Delay)
     logic [1:0]  kind_q1, kind_q2;
-    logic [11:0] fill_q1, fill_q2, rgb_q1, rgb_q2;
+    logic [11:0] fill_q1, fill_q2;
+    logic [11:0] rgb_q1,  rgb_q2;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -126,9 +127,7 @@ module ui_frame_overlay #(
         end
     end
 
-    //============================================================
-    // Stage 2 : ROM 응답과 정렬해 최종 색 결정
-    //============================================================
+    // Stage 2: Synchronized Color Multiplexing with ROM Output
     always_comb begin
         case (kind_q2)
             K_FILL:  o_rgb = fill_q2;
