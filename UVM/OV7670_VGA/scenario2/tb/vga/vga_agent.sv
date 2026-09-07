@@ -1,7 +1,7 @@
 `ifndef VGA_AGENT_SV
 `define VGA_AGENT_SV
 //======================================================================
-//  vga_agent : PASSIVE (monitor 만)
+//  vga_agent : PASSIVE, only monitoring
 //======================================================================
 class vga_agent extends uvm_agent;
   `uvm_component_utils(vga_agent)
