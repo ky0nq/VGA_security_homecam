@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-// Prof - Upscale
+// Upscale
 module rom_reader_upscale (
     input logic clk,
     input logic rst_n,
