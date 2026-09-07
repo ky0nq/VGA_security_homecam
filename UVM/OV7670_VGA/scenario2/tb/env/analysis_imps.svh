@@ -1,7 +1,7 @@
 `ifndef ENV_ANALYSIS_IMPS_SVH
 `define ENV_ANALYSIS_IMPS_SVH
 //======================================================================
-//  다중 analysis_imp 선언 (패키지 스코프, 클래스보다 먼저 include)
+//   analysis_imp declare
 //======================================================================
 `uvm_analysis_imp_decl(_cam)
 `uvm_analysis_imp_decl(_exp)
