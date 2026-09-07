@@ -1,7 +1,7 @@
 `ifndef CAM_DRIVER_SV
 `define CAM_DRIVER_SV
 //======================================================================
-//  cam_driver : cam_frame_item -> OV7670 QVGA RGB565 타이밍
+//  cam_driver : cam_frame_item -> OV7670 QVGA RGB565 timing
 //======================================================================
 class cam_driver extends uvm_driver #(cam_frame_item);
   `uvm_component_utils(cam_driver)
@@ -31,12 +31,11 @@ class cam_driver extends uvm_driver #(cam_frame_item);
   endtask
 
   task drive_frame(cam_frame_item f);
-    // ---- VSYNC 블랭크 : MEM_CONTROLLER 포인터 리셋 ----
     @(vif.cb); vif.cb.vsync <= 1'b1; vif.cb.href <= 1'b0;
     repeat (cfg.vsync_len) @(vif.cb);
     vif.cb.vsync <= 1'b0;
     repeat (cfg.vs_gap) @(vif.cb);
-    // ---- 행 루프 ----
+
     for (int y = 0; y < f.V; y++) begin
       vif.cb.href <= 1'b1;
       for (int x = 0; x < f.H; x++) begin
