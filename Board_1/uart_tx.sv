@@ -1,91 +1,90 @@
 `timescale 1ns / 1ps
 
-// Sends one byte over UART: start bit, 8 data bits, stop bit.
-
 module uart_tx #(
-    parameter integer CLK_FREQ_HZ = 100_000_000,
-    parameter integer BAUD_RATE   =115200   // must match the baud rate on the other board
-)(
+    parameter integer CLK_FREQ  = 100_000_000,
+    parameter integer BAUD_RATE = 115200
+) (
     input  logic       clk,
     input  logic       rst_n,
-
-    input  logic [7:0]  tx_data,
-    input  logic        tx_start,
-    output logic        tx_busy,
-
-    output logic        tx        // UART TX pin
+    input  logic       tx_start,
+    input  logic [7:0] tx_data,
+    output logic       tx_busy,
+    output logic        tx_done,
+    output logic        tx
 );
 
-    localparam integer BIT_PERIOD = CLK_FREQ_HZ / BAUD_RATE;
-    localparam int     CNT_WIDTH  = $clog2(BIT_PERIOD);
+    localparam integer CLKS_PER_BIT = CLK_FREQ / BAUD_RATE;
 
-    typedef enum logic [1:0] {IDLE, START, DATA, STOP} state_t;
+    typedef enum logic [1:0] {S_IDLE, S_START, S_DATA, S_STOP} state_t;
     state_t state;
 
-    logic [CNT_WIDTH-1:0] bit_cnt;
-    logic [2:0]            data_idx; // 0-7
-    logic [7:0]             shift_reg;
-
-    assign tx_busy = (state != IDLE);
+    logic [$clog2(CLKS_PER_BIT)-1:0] clk_cnt;
+    logic [2:0] bit_idx;
+    logic [7:0] data_reg;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            state     <= IDLE;
-            bit_cnt   <= 0;
-            data_idx  <= 0;
-            shift_reg <= 8'b0;
-            tx        <= 1'b1;   // line sits high when idle
+            state    <= S_IDLE;
+            clk_cnt  <= 0;
+            bit_idx  <= 0;
+            data_reg <= 0;
+            tx       <= 1'b1;
+            tx_busy  <= 1'b0;
+            tx_done  <= 1'b0;
         end else begin
+            tx_done <= 1'b0;
             case (state)
-                // wait here until someone asks us to send a byte
-                IDLE: begin
-                    tx <= 1'b1;
+                S_IDLE: begin
+                    tx      <= 1'b1;
+                    clk_cnt <= 0;
+                    bit_idx <= 0;
                     if (tx_start) begin
-                        shift_reg <= tx_data;
-                        bit_cnt   <= 0;
-                        data_idx  <= 0;
-                        state     <= START;
-                    end
-                end
-
-                // start bit = 0
-                START: begin
-                    tx <= 1'b0;
-                    if (bit_cnt == BIT_PERIOD - 1) begin
-                        bit_cnt <= 0;
-                        state   <= DATA;
+                        data_reg <= tx_data;
+                        tx_busy  <= 1'b1;
+                        state    <= S_START;
                     end else begin
-                        bit_cnt <= bit_cnt + 1;
+                        tx_busy <= 1'b0;
                     end
                 end
 
-                // send the 8 data bits, LSB first
-                DATA: begin
-                    tx <= shift_reg[data_idx];
-                    if (bit_cnt == BIT_PERIOD - 1) begin
-                        bit_cnt <= 0;
-                        if (data_idx == 3'd7) begin
-                            state <= STOP;
+                S_START: begin
+                    tx <= 1'b0;
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        state   <= S_DATA;
+                    end else begin
+                        clk_cnt <= clk_cnt + 1'b1;
+                    end
+                end
+
+                S_DATA: begin
+                    tx <= data_reg[bit_idx];
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        if (bit_idx == 3'd7) begin
+                            bit_idx <= 0;
+                            state   <= S_STOP;
                         end else begin
-                            data_idx <= data_idx + 1;
+                            bit_idx <= bit_idx + 1'b1;
                         end
                     end else begin
-                        bit_cnt <= bit_cnt + 1;
+                        clk_cnt <= clk_cnt + 1'b1;
                     end
                 end
 
-                // stop bit = 1
-                STOP: begin
+                S_STOP: begin
                     tx <= 1'b1;
-                    if (bit_cnt == BIT_PERIOD - 1) begin
-                        bit_cnt <= 0;
-                        state   <= IDLE;
+                    if (clk_cnt == CLKS_PER_BIT-1) begin
+                        clk_cnt <= 0;
+                        tx_busy <= 1'b0;
+                        tx_done <= 1'b1;
+                        state   <= S_IDLE;
                     end else begin
-                        bit_cnt <= bit_cnt + 1;
+                        clk_cnt <= clk_cnt + 1'b1;
                     end
                 end
 
-                default: state <= IDLE;
+                default: state <= S_IDLE;
             endcase
         end
     end

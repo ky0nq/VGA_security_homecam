@@ -1,7 +1,5 @@
 `timescale 1ns / 1ps
 
-// Watches the camera href/vsync/data lines and writes each pixel into the frame buffer.
-
 module OV7670_MemCNTL #(
     parameter IMG_W = 320,
     parameter IMG_H = 240,
@@ -18,8 +16,8 @@ module OV7670_MemCNTL #(
     output logic [DW-1:0] wData
 );
 
-    logic byteSel;      // picks the high byte or the low byte of one pixel
-    logic [7:0] px_data; // holds the first (high) byte until the second one arrives
+    logic byteSel;
+    logic [7:0] px_data;
 
     always_ff @(posedge pclk or negedge rst_n) begin
         if (!rst_n) begin
@@ -29,12 +27,10 @@ module OV7670_MemCNTL #(
             byteSel <= 1'b0;
             px_data <= 0;
         end else begin
-            we <= 1'b0;  // we is only high for 1 clock 
+            we <= 1'b0;  // 1 pulse setting
             if (we)
-                wAddr <= wAddr + 1'b1;  // move to the next pixel address
-
-            if (cam_vsync) begin
-                // new frame starting, go back to address 0
+                wAddr <= wAddr + 1'b1;  // Advance the pixel write address.
+            if (cam_vsync) begin // Start a new frame at address (0, 0).
                 wAddr <= 0;
                 byteSel <= 1'b0;
             end else if (!cam_href) begin
@@ -42,13 +38,12 @@ module OV7670_MemCNTL #(
                 // This prevents a partial/odd previous line from swapping the
                 // high and low bytes at the left edge of the next line.
                 byteSel <= 1'b0;
-            end else begin
-                // normal pixel data, merge the two bytes into one RGB565 word
+            end else begin // Merge pixel data within the current frame.
                 byteSel <= ~byteSel;
                 if (!byteSel) begin
-                    px_data <= cam_data;   // first byte, just save it
+                    px_data <= cam_data;
                 end else begin
-                    wData <= {px_data, cam_data};  // second byte, write both
+                    wData <= {px_data, cam_data};
                     we <= 1'b1;
                 end
             end
