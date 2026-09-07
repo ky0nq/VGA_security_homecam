@@ -1,30 +1,34 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// uart
-//   uart_rx + uart_tx만 묶은 순수 송수신 모듈 (디코더 없음)
-//   rx_data/rx_done은 counter/decoder 등 뒷단 모듈이 직접 받아서 씀
-//   tx_data/tx_start도 뒷단(counter)에서 만들어서 그대로 넣어주면 됨
-// ============================================================
+// =================================================================================
+// Module: uart
+// Description: Top-level wrapper instantiating UART Receiver (uart_rx) and 
+//              Transmitter (uart_tx) without internal decoding.
+// Parameters:
+//   - CLK_FREQ_HZ: System clock frequency in Hz (Default: 100 MHz)
+//   - BAUD_RATE  : Communication baud rate in bps (Default: 115200 bps)
+// =================================================================================
+
 module uart #(
-    parameter integer CLK_FREQ_HZ = 100_000_000,
-    parameter integer BAUD_RATE   = 115200  // 상대 보드 송수신측이랑 반드시 일치해야 함
+    parameter int CLK_FREQ_HZ = 100_000_000,
+    parameter int BAUD_RATE   = 115200
 )(
-    input  logic clk,
-    input  logic rst_n,
+    input  logic       clk,
+    input  logic       rst_n,
 
-    // ---- RX ----
-    input  logic       rx,        // UART RX 핀 (외부 입력, 비동기)
-    output logic [7:0] rx_data,
-    output logic        rx_done,   // 1클럭 펄스
+    // UART RX Interface
+    input  logic       rx,        // Asynchronous UART RX pin
+    output logic [7:0] rx_data,   // Received byte data
+    output logic       rx_done,   // 1-clock pulse indicating valid received data
 
-    // ---- TX ----
-    input  logic [7:0] tx_data,
-    input  logic        tx_start,  // 1클럭 펄스
-    output logic        tx_busy,
-    output logic        tx         // UART TX 핀
+    // UART TX Interface
+    input  logic [7:0] tx_data,   // Byte data to transmit
+    input  logic       tx_start,  // 1-clock pulse trigger for transmission
+    output logic       tx_busy,   // Transmission active indicator
+    output logic       tx         // UART TX pin
 );
 
+    // UART Receiver Instance
     uart_rx #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .BAUD_RATE  (BAUD_RATE)
@@ -36,6 +40,7 @@ module uart #(
         .rx_done(rx_done)
     );
 
+    // UART Transmitter Instance
     uart_tx #(
         .CLK_FREQ_HZ(CLK_FREQ_HZ),
         .BAUD_RATE  (BAUD_RATE)
