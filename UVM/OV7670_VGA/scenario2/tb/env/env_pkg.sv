@@ -1,7 +1,7 @@
 `ifndef ENV_PKG_SV
 `define ENV_PKG_SV
 //======================================================================
-//  env_pkg : predictor + scoreboard + env (include 목록)
+//  env_pkg : predictor + scoreboard + env
 //======================================================================
 package env_pkg;
   `include "uvm_macros.svh"
@@ -11,7 +11,7 @@ package env_pkg;
   import vga_pkg::*;
   `include "defs.svh"
 
-  `include "analysis_imps.svh"    // uvm_analysis_imp_decl (클래스보다 먼저)
+  `include "analysis_imps.svh"    // uvm_analysis_imp_decl
   `include "env_cfg.sv"
   `include "predictor.sv"
   `include "scoreboard.sv"
