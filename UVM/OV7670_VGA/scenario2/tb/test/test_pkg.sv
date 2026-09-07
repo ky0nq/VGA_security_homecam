@@ -1,8 +1,8 @@
 `ifndef TEST_PKG_SV
 `define TEST_PKG_SV
 //======================================================================
-//  test_pkg : 테스트 라이브러리 (include 목록)
-//    실행 :  ./simv +UVM_TESTNAME=base_test
+//  test_pkg : test library
+//    execute :  ./simv +UVM_TESTNAME=base_test
 //======================================================================
 package test_pkg;
   `include "uvm_macros.svh"
