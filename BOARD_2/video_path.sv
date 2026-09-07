@@ -1,58 +1,54 @@
 `timescale 1ns / 1ps
 
-// ============================================================
-// video_path
-//   VGA_CAM(SCCB+캡처+프레임버퍼+줌) -> GAUSS_FILTER / FILTER_APPLY
-//   두 갈래로 나눠서 unlock_en으로 mux
+// =================================================================================
+// Module: video_path
+// Description: Core video processing pipeline.
+//              Routes camera streams through Gaussian blurring (Locked State) or
+//              User Effects (Unlocked State) based on the `unlock_en` signal.
 //
-//   unlock_en = 0 (패턴 불일치, 잠김) -> GAUSS_FILTER 결과 사용
-//   unlock_en = 1 (패턴 일치, 잠금 해제) -> FILTER_APPLY 결과 사용
-//     (이때만 zoom_en/btn_l/r/d, effect_sel/btn_u 필터 조작이 실제로 반영됨
-//      - zoom 영역 선택은 rom_reader_upscale이 펄스를 받아 내부에 래치함,
-//        필터 순환은 filter_control이 unlock_en으로 게이팅함)
-//
-//   UART 관련(uart_link)은 이 모듈 밖에서 처리하고,
-//   이미 디코딩된 레벨/펄스 신호를 그대로 입력받음.
-//   RGB->RGB444 채널 분리 + 최종 출력 레지스터는 vga_outreg(top)가 담당하므로
-//   여기서는 o_rgb[11:0] 하나만 내보냄
-// ============================================================
+// Features:
+//   - OV7670 camera capture and framebuffer readout via `vga_cam`.
+//   - Gaussian blur pipeline (`gauss_filter_pipe`) applied when system is locked (`unlock_en = 0`).
+//   - Custom color/gamma/night-mode effects (`filter_apply` & `filter_control`) applied when unlocked (`unlock_en = 1`).
+//   - Dynamic MUX selection for output Sync and RGB streams.
+// =================================================================================
 
 module video_path (
-    input logic clk,      // 시스템 클럭
-    input logic pclk,     // OV7670 카메라 픽셀 클럭
-    input logic rst_n,
+    input  logic        clk,          // System clock (100 MHz)
+    input  logic        pclk,         // OV7670 camera pixel clock
+    input  logic        rst_n,        // Active-low asynchronous reset
 
-    // UART 디코더에서 이미 분리되어 들어오는 신호들
-    input logic unlock_en,   // uart_link의 unlock_en
-    input logic zoom_en,
-    input logic effect_sel,
-    input logic btn_l,
-    input logic btn_r,
-    input logic btn_d,
-    input logic btn_u,         // uart_link의 btn_u_pulse (이미 1클럭 펄스)
+    // UART Control Signals
+    input  logic        unlock_en,    // Security state: 0 = Locked (Gaussian), 1 = Unlocked (Custom Effects)
+    input  logic        zoom_en,      // Zoom mode enable
+    input  logic        effect_sel,   // Filter selection toggle mode
+    input  logic        btn_l,        // Left pan control pulse
+    input  logic        btn_r,        // Right pan control pulse
+    input  logic        btn_d,        // Down pan control pulse
+    input  logic        btn_u,        // Up pan / Filter cycle pulse (1-clock pulse)
 
-    // OV7670 캡처 인터페이스
-    input  logic       cam_href,
-    input  logic       cam_vsync,
-    input  logic [7:0] cam_data,
-    output logic       xclk,       // OV7670 XCLK 핀
+    // OV7670 Hardware Capture Interface
+    input  logic        cam_href,
+    input  logic        cam_vsync,
+    input  logic [7:0]  cam_data,
+    output logic        xclk,         // Master clock output to OV7670 (25 MHz)
 
-    // SCCB (OV7670 레지스터 초기화)
-    output logic setup_busy,
-    output logic setup_done,
-    output logic setup_error,
-    output logic cam_scl,
-    inout  wire  cam_sda,
+    // SCCB Configuration Interface
+    output logic        setup_busy,
+    output logic        setup_done,
+    output logic        setup_error,
+    output logic        cam_scl,
+    inout  wire         cam_sda,
 
-    // 최종 출력 (vga_outreg로 이어짐)
+    // Pipeline Video Stream Output (Drives `ui_frame_wrapper` / `vga_outreg`)
     output logic        o_h_sync,
     output logic        o_v_sync,
     output logic [11:0] o_rgb
 );
 
-    //============================================================
-    // VGA_CAM : SCCB + 캡처 + 프레임버퍼 + 줌/업스케일
-    //============================================================
+    //==============================================================================
+    // 1. VGA Camera Core (SCCB + Capture + Framebuffer + Upscaler/Pan/Zoom)
+    //==============================================================================
     logic        cam_h_sync;
     logic        cam_v_sync;
     logic [11:0] cam_rgb;
@@ -79,9 +75,9 @@ module video_path (
         .xclk       (xclk)
     );
 
-    //============================================================
-    // GAUSS_FILTER 갈래 (항상 계산)
-    //============================================================
+    //==============================================================================
+    // 2. Gaussian Blur Pipeline (Active when System is Locked)
+    //==============================================================================
     logic        gauss_h_sync;
     logic        gauss_v_sync;
     logic [11:0] gauss_rgb;
@@ -97,9 +93,9 @@ module video_path (
         .o_rgb   (gauss_rgb)
     );
 
-    //============================================================
-    // FILTER_CONTROL + FILTER_APPLY 갈래 (항상 계산)
-    //============================================================
+    //==============================================================================
+    // 3. User Filter Controller & Apply Pipeline (Active when System is Unlocked)
+    //==============================================================================
     logic pink_en, orange_en, blue_en, gray_en;
     logic gamma_en, gamma_level, night_en;
 
@@ -140,9 +136,9 @@ module video_path (
         .o_rgb      (filter_rgb)
     );
 
-    //============================================================
-    // 최종 MUX : unlock_en = 0 -> GAUSS, 1 -> FILTER_APPLY
-    //============================================================
+    //==============================================================================
+    // 4. Output Multiplexer (Selected by `unlock_en`)
+    //==============================================================================
     assign o_rgb    = unlock_en ? filter_rgb    : gauss_rgb;
     assign o_h_sync = unlock_en ? filter_h_sync : gauss_h_sync;
     assign o_v_sync = unlock_en ? filter_v_sync : gauss_v_sync;
