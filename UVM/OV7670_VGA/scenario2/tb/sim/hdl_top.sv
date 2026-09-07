@@ -1,4 +1,3 @@
-```systemverilog
 `timescale 1ns/1ps
 `include "defs.svh"
 //======================================================================
@@ -71,4 +70,3 @@ module hdl_top;
     `uvm_fatal("TIMEOUT", "Simulation timeout")
   end
 endmodule
-```
