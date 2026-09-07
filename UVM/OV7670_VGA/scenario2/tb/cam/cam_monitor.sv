@@ -1,7 +1,7 @@
 `ifndef CAM_MONITOR_SV
 `define CAM_MONITOR_SV
 //======================================================================
-//  cam_monitor : 버스에서 프레임을 재구성 -> analysis_port
+//  cam_monitor : frame reconstruction -> analysis_port
 //======================================================================
 class cam_monitor extends uvm_monitor;
   `uvm_component_utils(cam_monitor)
