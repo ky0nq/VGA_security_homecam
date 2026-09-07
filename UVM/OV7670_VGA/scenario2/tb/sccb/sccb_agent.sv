@@ -1,7 +1,7 @@
 `ifndef SCCB_AGENT_SV
 `define SCCB_AGENT_SV
 //======================================================================
-//  sccb_agent : PASSIVE (monitor 만)
+//  sccb_agent : PASSIVE, only monitoring
 //======================================================================
 class sccb_agent extends uvm_agent;
   `uvm_component_utils(sccb_agent)
