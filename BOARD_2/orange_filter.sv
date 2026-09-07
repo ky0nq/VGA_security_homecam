@@ -1,64 +1,80 @@
 `timescale 1ns / 1ps
 
-module orange_filter_pipe (
-    input logic clk,
-    input logic rst_n,
-    input logic orange_en,
-    input logic i_h_sync,
-    input logic i_v_sync,
-    input logic [11:0] i_rgb,
+// =================================================================================
+// Module: orange_filter_pipe
+// Description: Converts RGB to a warm Orange/Sepia tint based on pixel luminance.
+// Processing Pipeline:
+//   - Converts RGB to Luminance Y = (77*R + 150*G + 29*B) >> 8
+//   - Maps Luminance to Orange color ratio:
+//       R = Y * 1.0   (Red dominant)
+//       G = Y * 0.75  (Y - Y/4)
+//       B = Y * 0.125 (Y >> 3)
+// Latency: 2 Clock Cycles
+// =================================================================================
 
-    output logic o_h_sync,
-    output logic o_v_sync,
+module orange_filter_pipe (
+    input  logic        clk,
+    input  logic        rst_n,
+
+    input  logic        orange_en,
+
+    input  logic        i_h_sync,
+    input  logic        i_v_sync,
+    input  logic [11:0] i_rgb,
+
+    output logic        o_h_sync,
+    output logic        o_v_sync,
     output logic [11:0] o_rgb
 );
-    localparam LATENCY = 2;
 
-    // Stage 1 : multiply (밝기 계산용)
-    logic [11:0] s1_r, s1_g, s1_b, s1_rgb;
+    localparam int LATENCY = 2;
+
+    // Stage 1: Luminance Multiplication (77*R, 150*G, 29*B)
+    logic [11:0] s1_r, s1_g, s1_b;
+    logic [11:0] s1_rgb;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            s1_r   <= 0;
-            s1_g   <= 0;
-            s1_b   <= 0;
-            s1_rgb <= 0;
+            s1_r   <= 12'd0;
+            s1_g   <= 12'd0;
+            s1_b   <= 12'd0;
+            s1_rgb <= 12'd0;
         end else begin
-            s1_r   <= 8'd77 * i_rgb[11:8];
+            s1_r   <= 8'd77  * i_rgb[11:8];
             s1_g   <= 8'd150 * i_rgb[7:4];
-            s1_b   <= 8'd29 * i_rgb[3:0];
+            s1_b   <= 8'd29  * i_rgb[3:0];
             s1_rgb <= i_rgb;
         end
     end
 
-    // Stage 2 : add, shift → 밝기값을 오렌지 색조 비율로 매핑, mux
+    // Stage 2: Luminance Accumulation, Orange Tone Mapping & Output Muxing
     logic [11:0] y_sum;
-    logic [ 3:0] gray;
-    logic [ 3:0] orange_r, orange_g, orange_b;
+    logic [3:0]  gray;
+    logic [3:0]  orange_r, orange_g, orange_b;
 
     assign y_sum = s1_r + s1_g + s1_b;
-    assign gray  = y_sum[11:8];
+    assign gray  = y_sum[11:8];  // Equivalent to y_sum / 256
 
-    assign orange_r = gray;                // gray * 1.0 (dominant)
-    assign orange_g = gray - (gray >> 2);  // gray * 0.75
-    assign orange_b = gray >> 3;           // gray * 0.125 (거의 0, warm tone)
+    assign orange_r = gray;                 // R = Y * 1.00
+    assign orange_g = gray - (gray >> 2);   // G = Y * 0.75
+    assign orange_b = gray >> 3;            // B = Y * 0.125
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            o_rgb <= 0;
+            o_rgb <= 12'd0;
         end else begin
             o_rgb <= orange_en ? {orange_r, orange_g, orange_b} : s1_rgb;
         end
     end
 
+    // Sync Signal Delay Pipeline (Matching Data Latency)
     logic [LATENCY-1:0] h_sync_d, v_sync_d;
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             h_sync_d <= {LATENCY{1'b1}};
             v_sync_d <= {LATENCY{1'b1}};
-        end
-        else begin
+        end else begin
             h_sync_d <= {h_sync_d[LATENCY-2:0], i_h_sync};
             v_sync_d <= {v_sync_d[LATENCY-2:0], i_v_sync};
         end
