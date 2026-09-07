@@ -2,12 +2,14 @@
 `define COV_COLLECTOR_SV
 //======================================================================
 //  cov_collector : functional coverage
-//    cam_monitor / vga_monitor / sccb_monitor 의 analysis 포트에 연결
-//    (같은 포트를 scoreboard/predictor 와 공유 - analysis 는 1:N)
+//    Connected to the analysis ports of cam_monitor / vga_monitor / sccb_monitor
+//    (The same ports are shared with the scoreboard/predictor - analysis supports 1:N)
 //
-//  주의
-//   - cg_config(scale2x) 는 런당 1값 -> 100% 는 base + scale2x 두 런 merge 후
-//   - cg_cam_color 의 cross(27 bin) 는 gradient_test 로만 채워짐 (solid 는 1 bin)
+//  Notes
+//   - cg_config(scale2x) has only one value per run.
+//     -> 100% coverage is achieved after merging the base and scale2x runs.
+//   - The cross coverage (27 bins) in cg_cam_color is fully covered
+//     only by gradient_test. (solid fills only one bin)
 //======================================================================
 class cov_collector extends uvm_component;
   `uvm_component_utils(cov_collector)
@@ -16,9 +18,9 @@ class cov_collector extends uvm_component;
   uvm_analysis_imp_act  #(vga_frame_txn,  cov_collector) act_imp;
   uvm_analysis_imp_sccb #(sccb_txn,       cov_collector) sccb_imp;
 
-  bit       cfg_scale2x;      // env 가 set
+  bit       cfg_scale2x;      // Set by the environment
 
-  // ---- 샘플용 스크래치 ----
+  // ---- scratch sample ----
   bit [4:0] s_r, s_b;
   bit [5:0] s_g;
   int       s_x, s_y;
@@ -30,23 +32,23 @@ class cov_collector extends uvm_component;
     cp_scale2x : coverpoint cfg_scale2x { bins x1 = {0}; bins x2 = {1}; }
   endgroup
 
-  //------------------------------------------------ 카메라 픽셀 색 분포
+  //------------------------------------------------ 
   covergroup cg_cam_color;
     option.per_instance = 1;
     cp_r : coverpoint s_r { bins lo = {[0:7]};  bins mid = {[8:23]};  bins hi = {[24:31]}; }
     cp_g : coverpoint s_g { bins lo = {[0:15]}; bins mid = {[16:47]}; bins hi = {[48:63]}; }
     cp_b : coverpoint s_b { bins lo = {[0:7]};  bins mid = {[8:23]};  bins hi = {[24:31]}; }
-    x_rgb : cross cp_r, cp_g, cp_b;    // gradient_test 로만 채워짐
+    x_rgb : cross cp_r, cp_g, cp_b;    // Covered only by gradient_test
   endgroup
 
-  //------------------------------------------------ VGA 출력 좌표 영역 × scale2x
+  //------------------------------------------------ VGA output region × scale2x
   covergroup cg_vga_region;
     option.per_instance = 1;
     cp_xr : coverpoint s_x {
       bins x0    = {0};
       bins x_in  = {[1:318]};
       bins x_end = {319};
-      bins x_out = {[320:639]};       // scale2x=0 이면 검정 영역
+      bins x_out = {[320:639]};       // Black region when scale2x = 0
     }
     cp_yr : coverpoint s_y {
       bins y0    = {0};
@@ -55,7 +57,7 @@ class cov_collector extends uvm_component;
       bins y_out = {[240:479]};
     }
     cp_s2x : coverpoint cfg_scale2x { bins x1 = {0}; bins x2 = {1}; }
-    x_region : cross cp_xr, cp_yr, cp_s2x;   // 4×4×2 = 32, 두 런 merge 로 채움
+    x_region : cross cp_xr, cp_yr, cp_s2x;   // 4×4×2 = 32, covered by merging two runs
   endgroup
 
   //------------------------------------------------ SCCB
@@ -92,7 +94,7 @@ class cov_collector extends uvm_component;
     cg_config.sample();
   endfunction
 
-  // ----- 카메라 프레임 : 8×8 격자로 조밀 샘플 (색 cross 채우려고) -----
+  // ----- Camera frame: densely sampled on an 8×8 grid to fill the color cross -----
   function void write_cam(cam_frame_item f);
     for (int gy = 0; gy < 8; gy++)
       for (int gx = 0; gx < 8; gx++) begin
@@ -104,7 +106,8 @@ class cov_collector extends uvm_component;
       end
   endfunction
 
-  // ----- VGA 프레임 : x·y 대표값 이중 루프, 실제 관측된(seen) 픽셀만 -----
+  // ----- VGA frame: nested loop over representative x/y values,
+  //       sampling only pixels that were actually observed (seen) -----
   function void write_act(vga_frame_txn a);
     int xs [4] = '{0, 160, 319, 500};      // x0 / x_in / x_end / x_out
     int ys [4] = '{0, 120, 239, 300};      // y0 / y_in / y_end / y_out
