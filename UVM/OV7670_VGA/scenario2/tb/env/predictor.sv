@@ -1,7 +1,7 @@
 `ifndef PREDICTOR_SV
 `define PREDICTOR_SV
 //======================================================================
-//  predictor : 카메라 프레임 + scale2x -> 기대 VGA 프레임 (RGB565 -> RGB444)
+// predictor : camera frame + scale2x -> expected VGA frame (RGB565 -> RGB444)
 //======================================================================
 class predictor extends uvm_component;
   `uvm_component_utils(predictor)
