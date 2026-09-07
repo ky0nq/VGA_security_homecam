@@ -1,4 +1,3 @@
-```systemverilog
 `ifndef SCCB_TXN_SV
 `define SCCB_TXN_SV
 //======================================================================
@@ -20,4 +19,3 @@ class sccb_txn extends uvm_sequence_item;
   endfunction
 endclass
 `endif
-```
