@@ -1,7 +1,7 @@
 `ifndef SCOREBOARD_SV
 `define SCOREBOARD_SV
 //======================================================================
-//  scoreboard : 기대 vs 실제 VGA 프레임 비교 + SCCB 첫 write 체크
+// scoreboard : compares expected vs actual VGA frames + checks the first SCCB write
 //======================================================================
 class scoreboard extends uvm_component;
   `uvm_component_utils(scoreboard)
