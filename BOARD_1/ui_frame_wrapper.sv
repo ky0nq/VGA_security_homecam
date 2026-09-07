@@ -1,19 +1,17 @@
 `timescale 1ns / 1ps
 
-// 두 보드 공통으로 쓰는 UI 블록.
-// VGA 파이프라인 맨 끝(최종 출력 레지스터 직전)에 그대로 끼워 넣으면 된다.
+// Common UI block used for both boards.
+// Insert directly at the end of the VGA pipeline (just before final output register).
 //
-//   ... -> ui_frame_wrapper -> (vga_outreg) -> VGA 핀
+//   ... -> ui_frame_wrapper -> (vga_outreg) -> VGA Pins
 //
-// 들어오는 h_sync/v_sync로 좌표를 복원하므로 앞단 지연이 몇 클럭이든 상관없다.
-//
-//   보드1(Board A, 트래킹) : LABEL_ID=0, LABEL_W=78  -> "단말기"
-//   보드2(Board B, 홈캠)   : LABEL_ID=1, LABEL_W=52  -> "홈캠"
+//   Board 1 (Board A, Tracking) : LABEL_ID=0, LABEL_W=78  -> "Terminal"
+//   Board 2 (Board B, HomeCam)  : LABEL_ID=1, LABEL_W=52  -> "HomeCam"
 
 module ui_frame_wrapper #(
-    parameter int          LABEL_ID     = 0,
-    parameter int          LABEL_W      = 78,
-    parameter int          BORDER_PX    = 4,
+    parameter int         LABEL_ID     = 0,
+    parameter int         LABEL_W      = 78,
+    parameter int         BORDER_PX    = 4,
     parameter logic [11:0] BORDER_COLOR = 12'hFFF,
     parameter string       LABEL_MEM    = "ui_labels.mem"
 ) (
@@ -29,7 +27,7 @@ module ui_frame_wrapper #(
     output logic [11:0] o_rgb
 );
 
-    logic       de;
+    logic        de;
     logic [9:0] x, y;
 
     vga_sync_tracker U_TRACKER (
@@ -42,7 +40,7 @@ module ui_frame_wrapper #(
         .o_y     (y)
     );
 
-    logic       label_sel, label_pixel;
+    logic        label_sel, label_pixel;
     logic [6:0] label_x;
     logic [4:0] label_y;
 
@@ -73,7 +71,7 @@ module ui_frame_wrapper #(
         .o_rgb        (o_rgb)
     );
 
-    // 오버레이가 2클럭 지연시키므로 sync도 같이 지연
+    // Overlay has 2-clock latency, so delay sync signals accordingly
     logic h_sync_q1, v_sync_q1;
 
     always_ff @(posedge clk or negedge rst_n) begin
