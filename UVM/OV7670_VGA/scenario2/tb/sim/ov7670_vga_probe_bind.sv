@@ -1,4 +1,3 @@
-
 `timescale 1ns/1ps
 //======================================================================
 //  Inserts a monitoring interface inside top_OV7670_VGA.
