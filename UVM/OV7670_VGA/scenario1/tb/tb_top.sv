@@ -8,23 +8,19 @@ module tb_top;
     `include "uvm_macros.svh"
     logic clk=0, pclk=0;
     always #5ns clk=~clk;
-    // TB-COV-03: Host-selected phase metadata; pclk generation stays instrumented.
-    //VCS coverage off
+    // TB-COV-03: Host-selected phase metadata
     int phase_ns=0;
     int have_phase_arg;
-    //VCS coverage on
     initial begin
         $timeformat(-9,3," ns",12);
         have_phase_arg=$value$plusargs("PCLK_PHASE_NS=%d",phase_ns);
-        // TB-COV-04: Reject invalid simulator configuration; still terminates at runtime.
-        //VCS coverage off
+        // TB-COV-04: Reject invalid simulator configuration
         if(phase_ns<0 || phase_ns>39) $fatal(1,"PCLK_PHASE_NS must be 0..39");
-        //VCS coverage on
         vif.camera_phase_ns=phase_ns;
         #(phase_ns*1ns);
         forever #20ns pclk=~pclk;
     end
-    // Scales SCCB counters only, not Camera/VGA clocks. No board power-up logic.
+    // Scales SCCB counters only, not Camera/VGA clocks. 
     localparam int CFG_HZ=(`FAST_SETUP!=0) ? 1000000 : 100000000;
     cam_vga_if vif(clk,pclk);
 
@@ -45,7 +41,6 @@ module tb_top;
     assign vif.sccb_setup_state=u_sccb.U_OV7670_SETUP_CNTL.state;
 
     // Known source image -> VGA timing / address / RGB conversion / output.
-    // The source mux is TB wiring, NOT a board RTL top under verification.
     wire fb_we=vif.link_camera_to_vga ? vif.cap_we : vif.mem_we;
     wire [16:0] fb_addr=vif.link_camera_to_vga ? vif.cap_addr : vif.mem_addr;
     wire [15:0] fb_data=vif.link_camera_to_vga ? vif.cap_data : vif.mem_data;
@@ -74,8 +69,6 @@ module tb_top;
         uvm_config_db#(virtual cam_vga_if)::set(null,"*","vif",vif);
         run_test();
     end
-    // TB-COV-05: Optional waveform-file plumbing, not DUT behavior. Dumping is unchanged.
-    //VCS coverage off
     initial begin
 `ifdef FSDB
         string fsdb_file;
@@ -87,7 +80,6 @@ module tb_top;
         end
 `endif
     end
-    //VCS coverage on
     ap_write_range: assert property(@(posedge pclk)
         disable iff(!vif.rst_n || !vif.check_camera)
         vif.cap_we |-> (!$isunknown({vif.cap_addr,vif.cap_data}) && vif.cap_addr<76800))
@@ -110,10 +102,7 @@ module tb_top;
         disable iff(!vif.rst_n || !vif.check_vga) !vif.de ##1 vif.de);
     cp_vsync: cover property(@(posedge clk)
         disable iff(!vif.rst_n || !vif.check_vga) $fell(vif.v_sync));
-
-    // TB-COV-06: Checker implementation/diagnostics, not the clock generator RTL.
-    // Period/duty checks and their UVM errors still execute; u_camera_clock stays covered.
-    //VCS coverage off
+      
     time xclk_rise=0;
     bit xclk_seen=0;
     always @(negedge vif.rst_n) xclk_seen=0;
@@ -125,9 +114,7 @@ module tb_top;
     always @(negedge vif.xclk)
         if(vif.rst_n && vif.check_camera && xclk_seen && ($time-xclk_rise)!=20ns)
             `uvm_error("XCLK_DUTY","Camera XCLK high time must be 20 ns")
-    //VCS coverage on
-    // TB-COV-07: Simulator timeout guard. It remains active and fails stalled runs.
-    //VCS coverage off
+    // Simulator timeout guard. It remains active and fails stalled runs.
     initial begin
         int timeout_ms;
         timeout_ms=10000;
@@ -136,5 +123,4 @@ module tb_top;
         #(time'(timeout_ms)*1ms);
         `uvm_fatal("WATCHDOG","Global simulation timeout; check progress before increasing TIMEOUT_MS")
     end
-    //VCS coverage on
 endmodule
