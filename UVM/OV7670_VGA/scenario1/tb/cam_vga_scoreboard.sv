@@ -5,16 +5,11 @@ class cam_vga_scoreboard extends uvm_scoreboard;
     virtual cam_vga_if vif;
     uvm_event frame_done_event;
 
-    // These are accumulated across resets, so error-recovery tests retain evidence.
     longint unsigned camera_writes, expected_writes, camera_pixels, memory_loads;
     longint unsigned vga_pixels_checked, vga_lines, timing_frames;
     longint unsigned full_vga_frames, errors, comparisons;
     int unsigned min_frames = 1, min_writes = 76800, min_memory_loads = 0;
     bit write_images = 1;
-
-    // Never learn golden data from DUT write/read results. The selected source
-    // is camera input bytes, or the independent TB framebuffer load input.
-    // Framebuffer RTL has no reset: preserve reference memory across reset.
     logic [15:0] ref_mem [0:76799];
     bit ref_written [0:76799];
     bit in_reset, byte_phase, previous_vsync;
@@ -27,7 +22,7 @@ class cam_vga_scoreboard extends uvm_scoreboard;
     int unsigned pending_addr;
     int unsigned expected_load_addr, loads_in_memory_frame;
 
-    // A separate raster model makes an incorrect DUT x/y counter detectable.
+    // Detect DUT x/y counter errors using an independent raster model.
     int unsigned expected_x, expected_y;
     bit comparing_frame;
     int frame_pattern;
@@ -55,7 +50,6 @@ class cam_vga_scoreboard extends uvm_scoreboard;
 
     function void mismatch(string reason);
         errors++;
-        // Keep full error counts without producing millions of duplicate lines.
         if (errors <= 20)
             `uvm_error("CAM_VGA_MISMATCH", reason)
         else if (errors == 21)
@@ -108,8 +102,6 @@ class cam_vga_scoreboard extends uvm_scoreboard;
 
     function void observe_camera(cam_vga_seq_item tr);
         comparisons++;
-        // PRE-NBA we/wAddr/wData are the values the actual RAM consumes now.
-        // The pixel was assembled from camera bytes on the preceding pclk edge.
         if (tr.write_en !== pending_write)
             mismatch($sformatf("t=%0t camera_frame=%0d line=%0d write pulse expected=%0b actual=%b addr=%0d",
                 tr.sample_time, camera_frame, camera_line, pending_write,
@@ -181,8 +173,7 @@ class cam_vga_scoreboard extends uvm_scoreboard;
     endfunction
 
     function void observe_memory(cam_vga_seq_item tr);
-        // This transaction observes the TB source pins before the RAM edge.
-        // It does not obtain expected data from the DUT memory or read port.
+        // Observe TB source pins before the RAM edge.
         if ($isunknown(tr.write_en)) begin
             mismatch($sformatf("t=%0t VGA source load enable contains X/Z", tr.sample_time));
             return;
@@ -329,8 +320,6 @@ class cam_vga_scoreboard extends uvm_scoreboard;
         expected_de = (expected_x < 640 && expected_y < 480);
         expected_hsync = !(expected_x >= 656 && expected_x < 752);
         expected_vsync = !(expected_y >= 490 && expected_y < 492);
-        // Monitor has aligned raw raster/address, synchronous read data and
-        // registered RGB/sync to the same pixel. Do not add a second delay here.
         comparisons += 5;
         if (tr.x !== expected_x[9:0] || tr.y !== expected_y[9:0])
             mismatch($sformatf("t=%0t raster expected=(%0d,%0d) actual=(%0d,%0d)",
@@ -366,8 +355,7 @@ class cam_vga_scoreboard extends uvm_scoreboard;
                 mismatch($sformatf("t=%0t x=%0d y=%0d blanking RGB expected=000 actual=%03h",
                     tr.sample_time, expected_x, expected_y, tr.rgb));
         end else if (comparing_frame) begin
-            // Capture has finished. No simultaneous write/read collision is
-            // judged here; such RAM semantics are not specified by this RTL.
+            // Capture has finished.
             frame_pixels++;
             vga_pixels_checked++;
             if (golden_addr < 76800 && ref_written[golden_addr]) begin
