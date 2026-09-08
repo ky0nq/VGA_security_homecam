@@ -35,7 +35,6 @@ class cam_vga_driver extends uvm_driver #(cam_vga_seq_item);
             `uvm_fatal("SCCB_RESET_CONFIG","Invalid SCCB reset state/step target")
         req.sccb_target_observed=0;
         // Start and observe in one command: LOAD/SEND/NEXT last only 10 ns.
-        // The debug taps are read-only; the driver writes only interface pins.
         @(negedge vif.clk); #1ps;
         vif.sccb_start=1;
         start_cycles=0;
@@ -56,7 +55,6 @@ class cam_vga_driver extends uvm_driver #(cam_vga_seq_item);
                     req.sccb_target_setup ? "SETUP" : "MASTER",
                     req.sccb_target_state,req.sccb_target_step,
                     vif.sccb_master_state,vif.sccb_master_step,vif.sccb_setup_state,$time),UVM_LOW)
-                // Already at negedge clk +1 ps. Do not wait for pclk here.
                 apply_reset(0);
                 if(vif.sccb_master_state!==4'd0 || vif.sccb_setup_state!==3'd0 ||
                    vif.setup_busy!==1'b0 || vif.setup_done!==1'b0 || vif.setup_error!==1'b0 ||
@@ -80,14 +78,13 @@ class cam_vga_driver extends uvm_driver #(cam_vga_seq_item);
                 vif.pattern_id=int'(req.pattern);
             case(req.command)
                 CMD_RESET: begin
-                    // Legacy partial-pixel reset: intentionally leave one high byte.
+                    // Legacy partial-pixel reset
                     if(vif.check_camera && vif.rst_n) camera_cycle(1,0,8'ha5);
                     apply_reset();
                 end
-                CMD_RESET_RAW: apply_reset(); // No camera byte is inserted.
+                CMD_RESET_RAW: apply_reset(); 
                 CMD_RESET_ACTIVE: begin
                     // Called after VSYNC. HREF remains high, with an even byte count.
-                    // The final assembled pixel is cancelled before its RAM write edge.
                     for(int x=0;x<8;x++) begin
                         camera_cycle(1,0,8'h20+x);
                         camera_cycle(1,0,8'h80+x);
@@ -144,7 +141,7 @@ class cam_vga_driver extends uvm_driver #(cam_vga_seq_item);
                 CMD_SCCB_RESET_AT: sccb_reset_at(req);
                 CMD_FRAME_DONE: begin
                     repeat(4) camera_cycle(0,0,0);
-                    vif.capture_complete=1; // Scheduling flag; contains no golden pixel data.
+                    vif.capture_complete=1;
                 end
                 CMD_IDLE: repeat(req.gap_cycles) camera_cycle(0,0,8'hc3);
                 default: `uvm_fatal("CMD", "Unknown block stimulus command")
