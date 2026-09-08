@@ -48,9 +48,11 @@ VGA_security_homecam/
 │   ├── OV7670_VGA/
 │   │   ├── scenario1/               # Camera·VGA·SCCB UVM
 │   │   └── scenario2/               # Predictor·Scoreboard 기반 UVM
-│   └── Top/                        # 시스템 UVM 업로드용 placeholder
+│   └── Top/                        # Top System UVM
 └── README.md
 ```
+
+위 트리는 핵심 파일만 표시했습니다. [`BOARD_1`](https://github.com/ky0nq/VGA_security_homecam/tree/main/BOARD_1)과 [`BOARD_2`](https://github.com/ky0nq/VGA_security_homecam/tree/main/BOARD_2)에 세부 RTL을, [`Tb`](https://github.com/ky0nq/VGA_security_homecam/tree/main/Tb)와 [`UVM/OV7670_VGA`](https://github.com/ky0nq/VGA_security_homecam/tree/main/UVM/OV7670_VGA)에 검증 소스를 정리했습니다.
 
 ## 주요 기능
 
@@ -316,7 +318,6 @@ Camera Driver, Monitor, Predictor, Scoreboard를 구성해 영상 입력과 예�
 | BRAM Tile | 39.5 / 50 · 79% | 36.5 / 50 · 73% |
 | DSP | 1 / 90 | 0 / 90 |
 
-위 트리는 핵심 파일만 표시했습니다. [`BOARD_1`](https://github.com/ky0nq/VGA_security_homecam/tree/main/BOARD_1)과 [`BOARD_2`](https://github.com/ky0nq/VGA_security_homecam/tree/main/BOARD_2)에 세부 RTL을, [`Tb`](https://github.com/ky0nq/VGA_security_homecam/tree/main/Tb)와 [`UVM/OV7670_VGA`](https://github.com/ky0nq/VGA_security_homecam/tree/main/UVM/OV7670_VGA)에 검증 소스를 정리했습니다.
 
 ### 최종 프로젝트 실행
 
