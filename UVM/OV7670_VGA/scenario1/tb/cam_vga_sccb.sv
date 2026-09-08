@@ -15,8 +15,7 @@ class cam_vga_sccb extends uvm_component;
     int unsigned error_setups = 0;
     int unsigned errors = 0;
     int unsigned reset_interruptions = 0;
-    // Tests set only the outcomes required by their selected scenarios.
-    // Zero is intentional for camera/VGA tests that leave this block idle.
+    // Set only scenario-required outcomes; keep zero for camera/VGA tests that leave this block idle.
     int unsigned min_completed_setups = 0;
     int unsigned min_error_setups = 0;
     int unsigned min_reset_interruptions = 0;
@@ -40,8 +39,7 @@ class cam_vga_sccb extends uvm_component;
     time minimum_reset_delay, setup_timeout;
     int tick_div;
 
-    // evt: 0 completed wire transaction, 1 sampled ACK, 2 setup status,
-    //      3 reset, 4 timing mode. Every bin represents a planned scenario.
+    // evt: 0 completed wire transaction, 1 sampled ACK, 2 setup status, 3 reset, 4 timing mode. 
     covergroup sccb_cg with function sample(
         int evt, int table_index, int ack_byte, bit nack,
         bit outcome_error, bit interrupted, bit accelerated);
@@ -81,11 +79,7 @@ class cam_vga_sccb extends uvm_component;
             `uvm_fatal("SCCB_VIF", "cam_vga_if configuration key 'vif' is missing")
     endfunction
 
-    // Frozen delivery specification for this RTL snapshot, independent of
-    // the runtime DUT LUT. Review this table when the approved setup changes.
     // Each entry is {register_address, register_data}; device write byte=42.
-    // This checks delivery/order of the intended table, not sensor optics or
-    // whether these values are optimal for every physical OV7670 module.
     function logic [15:0] expected_config(int index);
         case (index)
              0: return 16'h1280;  1: return 16'h3a04;
@@ -133,8 +127,7 @@ class cam_vga_sccb extends uvm_component;
     endfunction
 
     function void reset_checker();
-        // There are no forked ACK tasks to survive reset. This function is
-        // called immediately on reset assertion as well as on clock samples.
+        // This function is called immediately on reset assertion as well as on clock samples.
         vif.sccb_ack_low = 0;
         if (was_reset_released) begin
             if (in_progress) reset_interruptions++;
@@ -173,8 +166,7 @@ class cam_vga_sccb extends uvm_component;
     endfunction
 
     function void begin_setup_request();
-        // SCCB_setup_CNTL has an external start input. Reset release alone
-        // does not request configuration, so idle time must never time out.
+        // SCCB_setup_CNTL has an external start input.
         checker_armed = 1;
         setup_accepted = 0;
         request_time = $time;
@@ -224,7 +216,6 @@ class cam_vga_sccb extends uvm_component;
 
     function void receive_rising_clock();
         logic expected_ack_level;
-        // The extra SCL rise used to form STOP is not a fourth data byte.
         if (byte_index >= 3) return;
         if (last_rise_time != 0 && $time - last_rise_time != expected_scl_period)
             fail($sformatf("SCL period expected=%0t actual=%0t", expected_scl_period, $time-last_rise_time));
@@ -256,11 +247,10 @@ class cam_vga_sccb extends uvm_component;
         last_fall_time = $time;
         if (bit_count == 8) begin
             if (!ack_sampled) begin
-                // Eighth bit has finished. Pull down only while SCL is low,
-                // and keep ACK valid across the entire ninth high phase.
+                // After bit 8, pull low during SCL low and hold ACK through the ninth high phase.
                 vif.sccb_ack_low = (transaction_nack_byte != byte_index);
             end else begin
-                // Ninth falling edge: release SDA before the next byte.
+                // Release SDA on the ninth falling edge before the next byte.
                 vif.sccb_ack_low = 0;
                 byte_index++;
                 bit_count = 0; shift_byte = 0; ack_sampled = 0;
@@ -288,9 +278,7 @@ class cam_vga_sccb extends uvm_component;
     function void check_status();
         if (!checker_armed) return;
         if (vif.setup_busy === 1'b1) setup_accepted = 1;
-        // Previous terminal flags remain high while a new request crosses
-        // the DUT input synchronizer. Compare the new outcome only after
-        // this attempt has actually asserted busy.
+        // Compare results only after this request asserts busy to exclude stale completion flags.
         if (!setup_accepted) begin
             if (!timeout_reported && $time > request_time + setup_timeout) begin
                 fail("Setup request was not accepted before timeout");
@@ -335,13 +323,9 @@ class cam_vga_sccb extends uvm_component;
         bit start_seen_now, stop_seen_now;
         vif.sccb_ack_low = 0;
         forever begin
-            // SCCB outputs change at positive system edges. Sampling at the
-            // following negative edge avoids NBA races. Even TICK_DIV=1
-            // leaves enough low time to drive/release the external ACK.
+            // Sample on falling edges to avoid NBA races; ACK timing remains sufficient even at TICK_DIV=1.
             @(negedge vif.clk or negedge vif.rst_n);
             if (!vif.check_sccb) begin
-                // A disabled responder must release the open-drain bus and
-                // must not create completion, timeout, or protocol results.
                 vif.sccb_ack_low = 0;
                 was_reset_released = 0;
                 checker_armed = 0; setup_accepted = 0;
