@@ -1,4 +1,3 @@
-// Carries only a reset target. The wire checker remains the golden reference.
 class cam_vga_sccb_reset_sequence extends uvm_sequence #(cam_vga_seq_item);
     `uvm_object_utils(cam_vga_sccb_reset_sequence)
     bit target_setup=0;
@@ -41,7 +40,7 @@ class cam_vga_test extends uvm_test;
     endtask
     task camera_reset_cases();
         longint unsigned before_writes;
-        // Initial raw reset was observed at idle; prove recovery with a full frame.
+        // After observing the initial raw reset at idle, verify recovery with a full frame.
         image_frame(RANDOM_PIXELS);
 
         command(CMD_VSYNC);
@@ -58,7 +57,7 @@ class cam_vga_test extends uvm_test;
             `uvm_error("RESET_PREFIX","Between-lines prefix must consume all 320 writes")
         image_frame(RANDOM_PIXELS);
 
-        command(CMD_RESET); // Existing unmatched-A5 case is retained.
+        command(CMD_RESET); 
         image_frame(RANDOM_PIXELS);
         for(int location=0;location<4;location++) begin
             if(env.cov.reset_asserted_hits[location]==0 || env.cov.reset_recovered_hits[location]==0)
@@ -134,7 +133,7 @@ class cam_vga_test extends uvm_test;
             command(CMD_SCCB_START); wait_sccb(1);
             repeat(100) @(negedge vif.clk);
             if(vif.setup_error!==1) `uvm_error("SCCB_STICKY","SCCB error was not retained")
-            // Retry from ERROR without reset. This exercises ERROR -> LOAD.
+            // Retry without reset to verify the ERROR → LOAD transition.
             vif.nack_transaction=-1; vif.nack_byte=-1;
             `uvm_info("SCENARIO",$sformatf("SCCB retry without reset after byte-%0d NACK",byte_index),UVM_LOW)
             command(CMD_SCCB_START); wait_sccb(0);
@@ -153,7 +152,7 @@ class cam_vga_test extends uvm_test;
         seq.target_setup=setup_target;
         seq.target_state=state_target;
         seq.target_step=step_target;
-        // ERROR is reached by a real first-byte NACK, never by forcing state.
+        // Enter ERROR through a real first-byte NACK without forcing state.
         vif.nack_transaction=(setup_target && state_target==7) ? 0 : -1;
         vif.nack_byte=(setup_target && state_target==7) ? 0 : -1;
         seq.start(env.agt.sqr);
@@ -170,8 +169,6 @@ class cam_vga_test extends uvm_test;
             before_completed,env.sccb.completed_setups,env.sccb.errors),UVM_LOW)
     endtask
     task sccb_reset_cases();
-        // Enumerations belong to this fixed RTL snapshot. Debug taps confirm
-        // reset targets/idle state; data and completion are wire-checked.
         env.sccb.min_completed_setups=18;
         env.sccb.min_error_setups=0;
         env.sccb.min_reset_interruptions=1;
@@ -179,11 +176,10 @@ class cam_vga_test extends uvm_test;
             sccb_reset_one(0,state_target);
         for(int state_target=1;state_target<=7;state_target++)
             sccb_reset_one(1,state_target);
-        // Normal bit cycling includes 3->0; reset must also exercise 1->0/2->0.
+        // Verify reset transitions 1→0 and 2→0 in addition to normal bit cycling 3→0.
         sccb_reset_one(0,2,1);
         sccb_reset_one(0,2,2);
     endtask
-    // Overridden by the separate white-box robustness test.
     virtual task sccb_fault_cases();
         `uvm_fatal("SCCB_FAULT_MODE","Select sccb_fault_test for fault injection")
     endtask
@@ -237,9 +233,7 @@ class cam_vga_test extends uvm_test;
         run_completed=1;
         phase.drop_objection(this);
     endtask
-
-    // check_phase has already checked counts, pending data and SCCB outcomes.
-    // PASS means the selected test completed its checks, not coverage closure.
+            
     function void report_phase(uvm_phase phase);
         uvm_report_server server;
         int error_count, fatal_count;
@@ -262,7 +256,7 @@ class cam_vga_test extends uvm_test;
         end
         if(vif.check_sccb)
             passed &= env.sccb.completed_setups>0 && env.sccb.total_transactions>0;
-        // error_setups counts expected NACK outcomes; it is not checker_errors.
+        // error_setups counts expected NACK outcomes.
         result_msg=$sformatf({
             "%s test=%s completed=%0b errors=%0d fatals=%0d ",
             "camera_writes=%0d vga_frames=%0d sccb_completed=%0d ",
@@ -278,7 +272,6 @@ class cam_vga_test extends uvm_test;
     endfunction
 endclass
 
-// Keep one familiar base file; select a block by +UVM_TESTNAME.
 class camera_test extends cam_vga_test;
     `uvm_component_utils(camera_test)
     function new(string name,uvm_component parent); super.new(name,parent); mode="camera"; endfunction
