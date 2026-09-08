@@ -7,9 +7,6 @@
 # make run TEST=...         : one test using an existing build
 # make run TAG=_wave DUMP=1 : save a separate waveform
 # make wave / cov / verdi  : waveform / report / coverage GUI
-# Sessions are automatic. Existing results are never deleted.
-# Recorder code coverage is disabled at COMPILE time; no GUI mask/elfile.
-# The tool-only scope file is generated under results/.../build automatically.
 # ==============================================================
 .DEFAULT_GOAL := all
 ROOT := $(abspath .)
@@ -49,7 +46,6 @@ RUN_DIR  = $(BASE)/runs/$(RUN_ID)
 FSDB     = $(RUN_DIR)/wave.fsdb
 CM       = line+cond+fsm+tgl+branch+assert
 
-# Compile order: RTL -> interface -> package -> top.
 RTL  = rtl/pclk_gen.sv rtl/pixel_counter.sv rtl/vga_decoder.sv
 RTL += rtl/OV7670_MemCNTL.sv rtl/framebuffer.sv rtl/rom_reader_upscale.sv
 RTL += rtl/OV7670_setup_FSM.sv rtl/I2C_master.sv rtl/SCCB_setup_CNTL.sv
@@ -82,7 +78,6 @@ all:
 	$(MAKE) remember
 	@echo "[RESULTS] $(ROOT)/results/$(SESSION)"
 
-# File existence only. VCS checks syntax/types; UVM checks behavior.
 check:
 	@test "$(FAST_SETUP)" = 0 -o "$(FAST_SETUP)" = 1 || { echo "FAST_SETUP must be 0 or 1"; exit 1; }
 	@for f in $(SRC); do test -f "$$f" || { echo "Missing source: $$f"; exit 1; }; done
@@ -113,7 +108,6 @@ run:
 	cd "$(RUN_DIR)" && "$(SIMV)" $(SIMV_OPTS) -l run.log
 	@grep -Fq '[TEST_RESULT] PASS ' "$(RUN_DIR)/run.log" || { echo "[RUN_RESULT] FAIL: $(RUN_ID)"; exit 1; }
 
-# Compile once, run 13 base tests + 6 phase tests in the same profile.
 regression: comp
 	@set -e; for t in $(TESTS); do $(MAKE) run TEST=$$t PHASE=0; done
 	@set -e; for p in 5 7 11; do \
@@ -130,8 +124,6 @@ cov report:
 	$(URG) -full64 -dir "$(COVDIR)" -report "$(BASE)/report" -format both
 	$(MAKE) check-coverage-scope
 
-# Verify the actual server-generated report, not a GUI filter or a fabricated score.
-# No scope files are retroactively added to old DBs. Rebuild in a NEW session.
 check-coverage-scope:
 	@test -f "$(TOOL_COV_SCOPE)" || { echo "Old build without recorder scope: run make all to create a NEW session."; exit 1; }
 	@for f in modlist.txt hierarchy.txt; do \
@@ -154,7 +146,6 @@ verdi: check-coverage-scope
 	@echo "[COVERAGE] $(COVDIR)"
 	$(VERDI) -cov -covdir "$(COVDIR)"
 
-# Called only after the requested run succeeds, never after a failed test.
 remember:
 	@test -n "$(SESSION)" && test -d "$(COVDIR)" || { echo "No coverage to remember."; exit 1; }
 	@printf '%s\n' "$(SESSION)" > "$(ROOT)/results/latest_session.$(SESSION).tmp"
