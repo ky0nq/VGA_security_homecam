@@ -4,7 +4,7 @@ class sccb_fault_test extends cam_vga_test;
     localparam string MASTER = "tb_top.u_sccb.U_I2C_MASTER";
     localparam string SETUP  = "tb_top.u_sccb.U_OV7670_SETUP_CNTL";
     int unsigned recovery_checks = 0;
-
+ 
     function new(string name, uvm_component parent);
         super.new(name,parent);
         mode="sccb_fault";
