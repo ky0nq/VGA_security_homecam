@@ -9,13 +9,11 @@ typedef enum int {OBS_CAMERA, OBS_VGA, OBS_MEMORY, OBS_RESET} observation_e;
 class cam_vga_seq_item extends uvm_sequence_item;
     `uvm_object_utils(cam_vga_seq_item)
     command_e command;
-    // Directed reset scheduling only; never supplies expected SCCB data.
     bit sccb_target_setup = 0;
     int sccb_target_state = -1;
     int sccb_target_step = -1; // -1 accepts any quarter-bit phase.
     bit sccb_target_observed = 0;
     pattern_e pattern;
-    // Observations leave this empty; only randomized line requests allocate it.
     rand bit [15:0] pixels[];
     constraint c_pixels { pixels.size() == 320; }
     rand int unsigned gap_cycles;
