@@ -1,6 +1,4 @@
-// Deliberate white-box robustness scenarios, separate from pin-level tests.
-// X injection exercises defensive RTL simulation paths; it is NOT a normal
-// camera stimulus or a claim of silicon fault tolerance / formal reachability.
+// White-box X-injection tests exercise defensive RTL paths separately from pin-level tests.
 class sccb_fault_test extends cam_vga_test;
     `uvm_component_utils(sccb_fault_test)
     localparam string MASTER = "tb_top.u_sccb.U_I2C_MASTER";
@@ -49,8 +47,7 @@ class sccb_fault_test extends cam_vga_test;
         int tick_div;
         tick_div=vif.cfg_freq_hz/(4*vif.sccb_freq_hz);
         if (tick_div<1) tick_div=1;
-        // Deposit after the wire monitor's negedge sample; let one rising
-        // edge execute the recovery branch. Never force the expected result.
+        // Deposit after the wire monitor's negedge sample; let one rising edge execute the recovery branch. 
         @(negedge vif.clk); #1ns;
         poke({MASTER,".state"},state_value);
         if (unknown_step) poke({MASTER,".step"},'x);
@@ -76,14 +73,9 @@ class sccb_fault_test extends cam_vga_test;
     virtual task sccb_fault_cases();
         int unsigned before_transactions, before_completed;
         env.sccb.min_completed_setups=2;
-
-        // 4-bit master state has unused encodings; each phase case has only
-        // 0..3 as valid values. X is required to reach its defensive default.
         inject_master_fault(15,0);
         for (int state_value=1;state_value<=8;state_value++)
             inject_master_fault(state_value,1);
-
-        // Setup has all eight binary states, so this is explicitly X recovery.
         @(negedge vif.clk); #1ns;
         poke({SETUP,".state"},'x);
         poke({SETUP,".config_idx"},127);
@@ -98,9 +90,7 @@ class sccb_fault_test extends cam_vga_test;
         recovery_checks++;
         checked_setup();
 
-        // Interface backpressure: the sole-owner integration normally reaches
-        // SEND with busy=0. Emulate an occupied master, verify no early request,
-        // release it, and check every real byte on the wire as usual.
+        // Verify request blocking while the master is busy and byte transfers after release.
         command(CMD_RESET_RAW);
         before_transactions=env.sccb.total_transactions;
         before_completed=env.sccb.completed_setups;
