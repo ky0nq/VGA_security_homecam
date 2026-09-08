@@ -1,0 +1,80 @@
+<Command name="schRTLInfo"  delimiter="."  >
+<RTLBlock >
+<RTLInfo   name="c_state_0"  type="2"  fileName="../RTL/VGA_Tracking/control_unit.sv"  >
+    <Seg beginLine="86"  endLine="143"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_CONTROL_UNIT"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_1"  type="2"  fileName="../RTL/VGA_Tracking/uart_tx.sv"  >
+    <Seg beginLine="27"  endLine="66"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_UART_TX"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_2"  type="2"  fileName="../RTL/VGA_Tracking/uart_rx.sv"  >
+    <Seg beginLine="37"  endLine="74"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_UART_RX"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_3"  type="2"  fileName="../RTL/VGA_Tracking/OV7670_setup_FSM.sv"  >
+    <Seg beginLine="196"  endLine="296"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_CAMERA_FRONTEND.U_SCCB_SETUP_CNTL.U_OV7670_SETUP_CNTL"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_4"  type="2"  fileName="../RTL/Video_Datapath/I2C_master.sv"  >
+    <Seg beginLine="65"  endLine="367"  />
+  </RTLInfo>
+ <RTLInfo   name="step_5"  type="2"  fileName="../RTL/Video_Datapath/I2C_master.sv"  >
+    <Seg beginLine="72"  endLine="119"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board2.U_VIDEO_PATH.U_VGA_CAM.U_SCCB_SETUP_CNTL.U_I2C_MASTER"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_6"  type="2"  fileName="../RTL/VGA_Tracking/tracking_path_overlay.sv"  >
+    <Seg beginLine="232"  endLine="410"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_BOARD1_VIDEO_PATH.U_TRACKING_PATH_OVERLAY"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_7"  type="2"  fileName="../RTL/Video_Datapath/uart_tx.sv"  >
+    <Seg beginLine="37"  endLine="71"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board2.U_UART_LINK.U_UART.U_UART_TX"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_8"  type="2"  fileName="../RTL/Video_Datapath/uart_rx.sv"  >
+    <Seg beginLine="44"  endLine="83"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board2.U_UART_LINK.U_UART.U_UART_RX"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_9"  type="2"  fileName="../RTL/Video_Datapath/OV7670_setup_FSM.sv"  >
+    <Seg beginLine="196"  endLine="297"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board2.U_VIDEO_PATH.U_VGA_CAM.U_SCCB_SETUP_CNTL.U_OV7670_SETUP_CNTL"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_10"  type="2"  fileName="../RTL/VGA_Tracking/auth_control_unit.sv"  >
+    <Seg beginLine="101"  endLine="163"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_AUTH_PATH.U_AUTH_CONTROL_UNIT"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="state_11"  type="2"  fileName="../RTL/VGA_Tracking/I2C_master.sv"  >
+    <Seg beginLine="65"  endLine="367"  />
+  </RTLInfo>
+ <RTLInfo   name="step_12"  type="2"  fileName="../RTL/VGA_Tracking/I2C_master.sv"  >
+    <Seg beginLine="72"  endLine="119"  />
+  </RTLInfo>
+ <Instance name="tb_top.u_board1.U_CAMERA_FRONTEND.U_SCCB_SETUP_CNTL.U_I2C_MASTER"  />
+</RTLBlock>
+<RTLBlock >
+<RTLInfo   name="user_verbosity_13"  type="2"  fileName="/tools/synopsys/vcs/W-2024.09-SP2/etc/uvm-1.2/verdi/uvm_custom_install_verdi_recorder.sv"  >
+    <Seg beginLine="47"  endLine="203"  />
+  </RTLInfo>
+ <Instance name="uvm_custom_install_verdi_recording"  />
+</RTLBlock>
+ </Command>
