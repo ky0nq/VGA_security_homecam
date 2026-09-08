@@ -239,7 +239,7 @@ Python Golden Reference와 RTL 출력을 픽셀 단위로 비교했습니다.
 | Gamma 밝기 설정 2종 / Night | 각 100% | 0 |
 | 16×16 Blur | 95.99% | 8 / 15 |
 
-블러 비교 대상은 **76,800픽셀**이며 평균 채널 오차는 **0.0319**입니다. 블러는 보고서의 판정 기준에서 PASS로 기록되었으며, 완전 일치 결과와 구분합니다.
+블러 비교 대상은 **76,800픽셀**이며 평균 채널 오차는 **0.0319**입니다. 
 
 ### 카메라·VGA UVM
 
@@ -268,7 +268,7 @@ Camera Driver, Monitor, Predictor, Scoreboard를 구성해 영상 입력과 예�
 
 `AUTH_SUCCESS` 시나리오는 **5개 검사 PASS, FAIL 0**, Top 기능 검증은 **정의한 8개 Covergroup 기준 Functional Coverage 100%**를 기록했습니다.
 
-통합 제어 Testbench는 인증 결과를 주입하거나 인증 상태를 설정해 이후의 UART·FSM 연결을 검증합니다. 실제 영상 입력에서 패턴 인식까지의 경로는 이 통합 테스트의 검증 범위와 구분합니다.
+통합 제어 Testbench는 인증 결과를 주입하거나 인증 상태를 설정해 이후의 UART·FSM 연결을 검증합니다. 
 
 <img width="1664" height="757" alt="image" src="https://github.com/user-attachments/assets/cfb53339-5468-4ede-9ff4-9263d6211dd6" />
 
