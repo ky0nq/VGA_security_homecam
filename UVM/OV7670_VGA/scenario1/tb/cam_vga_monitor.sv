@@ -16,7 +16,7 @@ class cam_vga_monitor extends uvm_monitor;
         bit previous_reset=1;
         forever begin
             @(posedge vif.pclk);
-            // PRE-NBA: camera write port values consumed by RAM on this edge.
+            // camera write port values consumed by RAM on this edge.
             if(vif.check_camera && (!vif.rst_n || vif.cam_href!==1'b0 ||
                vif.cam_vsync!==1'b0 || vif.cap_we!==1'b0 || previous_active || previous_reset)) begin
                 tr=cam_vga_seq_item::type_id::create("camera_sample");
@@ -35,7 +35,6 @@ class cam_vga_monitor extends uvm_monitor;
         cam_vga_seq_item tr;
         forever begin
             @(posedge vif.pclk);
-            // Golden source is the TB's write INPUT, never the DUT's read result.
             if(vif.check_vga && !vif.link_camera_to_vga && vif.mem_we!==1'b0) begin
                 tr=cam_vga_seq_item::type_id::create("memory_load");
                 tr.observation=OBS_MEMORY; tr.reset_active=!vif.rst_n;
@@ -61,7 +60,7 @@ class cam_vga_monitor extends uvm_monitor;
                 reset_seen=1;
             end else begin
                 reset_seen=0; cycles++;
-                // Independent cadence: enable rises on edge4; counter consumes on5.
+                // enable rises on edge4; counter consumes on5.
                 if(vif.check_vga && cycles>=5 && ((cycles-5)%4)==0) begin
                     tr=cam_vga_seq_item::type_id::create("vga_sample");
                     tr.observation=OBS_VGA;
@@ -69,9 +68,9 @@ class cam_vga_monitor extends uvm_monitor;
                     tr.read_addr=vif.rd_addr;
                     tr.full_frame_ready=vif.capture_complete;
                     tr.pattern=pattern_e'(vif.pattern_id); tr.sample_time=$time;
-                    #1ps; tr.read_data=vif.rd_data; // RAM read for PRE-edge address
+                    #1ps; tr.read_data=vif.rd_data; // RAM read for edge address
                     @(posedge vif.clk); cycles++;
-                    #1ps; // vga_outreg adds one more system-clock stage
+                    #1ps; 
                     if(vif.rst_n) begin
                         tr.rgb=vif.rgb; tr.hsync=vif.h_sync; tr.vsync_out=vif.v_sync;
                         ap.write(tr);
